@@ -1,0 +1,7 @@
+home:
+  home_link: "//a[contains(@class, 'menu_home') and normalize-space()='Home']"
+  brands_section: "//section[6]"
+  brands_list: "//ul[contains(@class, 'nav')]//a[contains(@href, 'brand')]"
+  dove_brand_link: "//section[6]//ul//li[7]//div//a"
+  scroll_container: "//div[contains(@class, 'brands')]"
+

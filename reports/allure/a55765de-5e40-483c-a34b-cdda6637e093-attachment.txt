@@ -1,0 +1,9 @@
+[32mINFO    [0m conftest:conftest.py:164 Starting test: test_scenario_1_invalid_password
+[32mINFO    [0m conftest:conftest.py:208 Setting up test environment
+[32mINFO    [0m conftest:conftest.py:222 Test environment setup completed
+[32mINFO    [0m conftest:conftest.py:67 Playwright instance started
+[32mINFO    [0m conftest:conftest.py:96 Browser chromium launched (headless: False)
+[32mINFO    [0m src.pages.base_page:base_page.py:152 Navigating to: https://www.saucedemo.com
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:23 [Scenario 1] Error visible → Expected: True | Actual: True
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:27 [Scenario 1] Error message → Expected contains: Epic sadface: Username and password do not match any user in this service | Actual: Epic sadface: Username and password do not match any user in this service
+[32mINFO    [0m conftest:conftest.py:172 Test test_scenario_1_invalid_password completed in 4.45s

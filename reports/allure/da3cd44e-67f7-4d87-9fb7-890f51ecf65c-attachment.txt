@@ -1,0 +1,6 @@
+2025-08-18 19:26:31,883 - conftest - INFO - Starting test: test_scenario_4_multiple_flow
+2025-08-18 19:26:32,337 - src.pages.base_page - INFO - Navigating to: https://www.saucedemo.com
+2025-08-18 19:27:45,150 - conftest - INFO - Saved screenshot: artifacts\screenshots\test_scenario_4_multiple_flow.png
+2025-08-18 19:27:45,190 - conftest - INFO - Test test_scenario_4_multiple_flow completed in 73.31s
+2025-08-18 19:27:46,938 - conftest - INFO - Browser chromium closed
+2025-08-18 19:27:47,011 - conftest - INFO - Playwright instance stopped

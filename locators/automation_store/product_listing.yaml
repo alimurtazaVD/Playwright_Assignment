@@ -1,0 +1,7 @@
+product_listing:
+  sort_dropdown: "#sort"
+  product_items: ".product-thumb"
+  product_name: "h4 a"
+  product_price: ".oneprice"
+  product_link: "h4 a"
+

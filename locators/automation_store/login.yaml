@@ -1,0 +1,8 @@
+login:
+  login_link: "//a[normalize-space()='Login or register']"
+  username_input: "//form//fieldset//div[1]//div[1]//input[1]"
+  password_input: "//form//fieldset//div[2]//div[1]//input[1]"
+  login_button: "//form//fieldset//button[contains(@title, 'Login') or contains(text(), 'Login')]"
+  account_dropdown: "//a[contains(@class, 'dropdown-toggle') and contains(text(), 'Welcome')]"
+  logout_link: "//a[contains(@href, 'account/logout')]"
+

@@ -1,0 +1,116 @@
+# Playwright Test Automation Framework Configuration
+# Environment: dev
+
+# Global Settings
+global:
+  timeout: 30000  # milliseconds
+  retries: 2
+  headless: false
+  viewport:
+    width: 1920
+    height: 1080
+  trace: "on-first-retry"  # off, on, on-first-retry, retain-on-failure
+  video: "retain-on-failure"  # off, on, on-first-retry, retain-on-failure
+  screenshot: "only-on-failure"  # off, on, on-first-retry, only-on-failure
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+
+# Browser Configuration
+browsers:
+  chromium:
+    name: "chromium"
+    channel: "chrome"
+    args: ["--no-sandbox", "--disable-dev-shm-usage"]
+  firefox:
+    name: "firefox"
+    args: ["--no-sandbox"]
+  webkit:
+    name: "webkit"
+    args: ["--no-sandbox"]
+
+# Environment-specific configurations
+environments:
+  dev:
+    base_url: "https://www.saucedemo.com"
+    browser: "firefox"   # chromium | firefox | webkit
+    headless: false
+    timeout: 45000
+    retries: 1
+    log_level: "DEBUG"
+    db:
+      # Full DSN for XAMPP MySQL 
+      dsn: "mysql+pymysql://root:@127.0.0.1:3306/testdb"
+      dialect: "mysql"
+      driver: "pymysql"
+      host: "127.0.0.1"
+      port: 3306
+      username: "root"
+      password: ""
+      database: "testdb"
+      pool_size: 5
+      max_overflow: 10
+  
+  automation_store:
+    base_url: "https://automationteststore.com/"
+    browser: "chromium"
+    headless: false
+    timeout: 50000
+    retries: 2
+    log_level: "INFO"
+
+# Test Data
+test_data:
+  users:
+    standard_user:
+      username: "standard_user"
+      password: "secret_sauce"
+    locked_out_user:
+      username: "locked_out_user"
+      password: "secret_sauce"
+    invalid_user:
+      username: "invalid_user"
+      password: "wrong_password"
+  login_messages:
+    invalid_credentials: "Epic sadface: Username and password do not match any user in this service"
+    locked_out: "Epic sadface: Sorry, this user has been locked out."
+  timeouts:
+    short: 5000
+    medium: 15000
+    long: 30000
+  
+  # Automation Test Store credentials
+  automation_store:
+    login_user:
+      username: "Murtaza_123"
+      password: "Password@123"
+
+# Reporting
+reporting:
+  reporter: "html"  # html or allure; can be overridden by --reporter CLI
+  html:
+    enabled: true
+    output_dir: "reports"
+    file_name: "report.html"
+    self_contained: true
+  allure:
+    enabled: true
+    output_dir: "reports/allure"
+  artifacts:
+    output_dir: "artifacts"
+    screenshots: true
+    videos: true
+    traces: true
+
+# Parallel Execution
+parallel:
+  workers: "auto"
+  max_workers: 4
+  min_workers: 1
+
+# Hooks
+hooks:
+  setup:
+    seed_data: true
+    cleanup: true
+  teardown:
+    cleanup: true
+    generate_report: true

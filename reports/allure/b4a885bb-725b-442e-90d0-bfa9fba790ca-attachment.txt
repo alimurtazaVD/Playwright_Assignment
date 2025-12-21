@@ -1,0 +1,8 @@
+2025-08-18 19:26:27,271 - conftest - INFO - Starting test: test_scenario_3_sort_and_cart
+2025-08-18 19:26:27,949 - src.pages.base_page - INFO - Navigating to: https://www.saucedemo.com
+2025-08-18 19:26:31,357 - tests.test_swag_scenarios - INFO - [Scenario 3] Prices sorted check → Expected: [7.99, 9.99, 15.99, 15.99, 29.99, 49.99] | Actual: [7.99, 9.99, 15.99, 15.99, 29.99, 49.99]
+2025-08-18 19:26:31,583 - tests.test_swag_scenarios - INFO - [Scenario 3] Lowest two selected → [7.99, 9.99]
+2025-08-18 19:26:31,695 - tests.test_swag_scenarios - INFO - [Scenario 3] Cart item count → Expected: 2 | Actual: 2
+2025-08-18 19:26:31,709 - tests.test_swag_scenarios - INFO - [Scenario 3] Cart quantities → Expected: all 1 | Actual: [1, 1]
+2025-08-18 19:26:31,726 - tests.test_swag_scenarios - INFO - [Scenario 3] Cart prices → Expected (two lowest): [7.99, 9.99] | Actual (first two): [7.99, 9.99]
+2025-08-18 19:26:31,727 - conftest - INFO - Test test_scenario_3_sort_and_cart completed in 4.46s

@@ -1,0 +1,9 @@
+cart:
+  cart_checkout_button: "//form//div//div//div//a[1]"
+  cart_items: "//table[@class='table table-striped table-bordered']//tbody//tr"
+  item_name: ".//td[@class='align_left']//a"
+  item_quantity: ".//input[contains(@id, 'cart_quantity')]"
+  item_price: ".//td[@class='align_right']"
+  total_price: "//td[@class='align_right']//strong"
+  cart_table: "//table[@class='table table-striped table-bordered']"
+

@@ -1,0 +1,5 @@
+[32mINFO    [0m conftest:conftest.py:164 Starting test: test_scenario_2_valid_login
+[32mINFO    [0m src.pages.base_page:base_page.py:152 Navigating to: https://www.saucedemo.com
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:42 [Scenario 2] URL → Expected contains: inventory.html | Actual: https://www.saucedemo.com/inventory.html
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:49 [Scenario 2] Title → Expected: products | Actual: products
+[32mINFO    [0m conftest:conftest.py:172 Test test_scenario_2_valid_login completed in 3.03s

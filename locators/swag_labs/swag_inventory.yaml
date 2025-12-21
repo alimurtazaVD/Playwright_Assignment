@@ -1,0 +1,12 @@
+swag_inventory:
+  filter_dropdown: "select[data-test='product-sort-container']"
+  item_card: ".inventory_item"
+  item_price: ".inventory_item_price"
+  item_title: ".inventory_item_name"
+  add_to_cart_button: "button.btn_inventory"
+  cart_icon: ".shopping_cart_link"
+  menu_button: "#react-burger-menu-btn"
+  about_link: "#about_sidebar_link"
+  page_title: 
+    css: "span.title"
+

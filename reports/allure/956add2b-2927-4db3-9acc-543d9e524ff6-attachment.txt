@@ -1,0 +1,8 @@
+[32mINFO    [0m conftest:conftest.py:164 Starting test: test_scenario_3_sort_and_cart
+[32mINFO    [0m src.pages.base_page:base_page.py:152 Navigating to: https://www.saucedemo.com
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:69 [Scenario 3] Prices sorted check → Expected: [7.99, 9.99, 15.99, 15.99, 29.99, 49.99] | Actual: [7.99, 9.99, 15.99, 15.99, 29.99, 49.99]
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:76 [Scenario 3] Lowest two selected → [7.99, 9.99]
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:84 [Scenario 3] Cart item count → Expected: 2 | Actual: 2
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:88 [Scenario 3] Cart quantities → Expected: all 1 | Actual: [1, 1]
+[32mINFO    [0m tests.test_swag_scenarios:test_swag_scenarios.py:93 [Scenario 3] Cart prices → Expected (two lowest): [7.99, 9.99] | Actual (first two): [7.99, 9.99]
+[32mINFO    [0m conftest:conftest.py:172 Test test_scenario_3_sort_and_cart completed in 4.46s

@@ -1,0 +1,42 @@
+# Core Testing Framework
+pytest>=7.4.0
+pytest-playwright>=0.4.0
+pytest-html>=3.2.0
+pytest-xdist>=3.3.0
+pytest-rerunfailures>=12.0
+pytest-metadata>=3.0.0
+
+# Playwright
+playwright>=1.40.0
+
+# Page Object Model & Locators
+pyyaml>=6.0.1
+jsonschema>=4.19.0
+
+# Database Connectivity
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.7
+pymysql>=1.1.0
+
+# Logging & Configuration
+python-dotenv>=1.0.0
+structlog>=23.2.0
+colorama>=0.4.6
+
+# Reporting & Artifacts
+allure-pytest>=2.13.2
+allure-python-commons>=2.13.2
+
+# Code Quality & Pre-commit
+black>=23.9.0
+ruff>=0.1.0
+pre-commit>=3.5.0
+
+# Utilities
+faker>=20.1.0
+requests>=2.31.0
+webdriver-manager>=4.0.0
+
+# Development & Testing
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1

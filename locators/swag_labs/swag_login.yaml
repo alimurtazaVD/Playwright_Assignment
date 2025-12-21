@@ -1,0 +1,8 @@
+swag_login:
+  username_input: "#user-name"
+  password_input: "#password"
+  login_button: "#login-button"
+  error_container: "[data-test='error']"
+  robot_img: "div.login_logo"
+  footer: "div.login_wrapper"
+

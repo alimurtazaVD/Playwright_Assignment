@@ -1,0 +1,10 @@
+product:
+  sort_dropdown: "//select[@id='sort']"
+  product_items: "//div[@class='product-thumb']"
+  product_name: ".//h4//a[@title]"
+  product_price: ".//div[@class='pricetag jumbotron']//div[@class='oneprice']"
+  add_to_cart_button: ".//div[@class='contentpanel']//div[3]//a[1]//i[1]"
+  first_product_link: "(//div[@class='product-thumb']//a)[1]"
+  product_link: ".//div[@class='contentpanel']//div[1]//div[2]//div[1]//a[1]"
+  added_to_cart: "//a[@title='Added to cart']//i[@class='fa fa-shopping-cart fa-fw']"
+

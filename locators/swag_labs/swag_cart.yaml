@@ -1,0 +1,7 @@
+swag_cart:
+  cart_item: ".cart_item"
+  cart_quantity: ".cart_quantity"
+  cart_item_price: ".inventory_item_price"
+  checkout_button: "#checkout"
+  continue_shopping: "#continue-shopping"
+

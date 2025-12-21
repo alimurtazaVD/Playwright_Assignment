@@ -1,0 +1,5 @@
+2025-08-18 19:26:24,006 - conftest - INFO - Starting test: test_scenario_2_valid_login
+2025-08-18 19:26:24,326 - src.pages.base_page - INFO - Navigating to: https://www.saucedemo.com
+2025-08-18 19:26:27,013 - tests.test_swag_scenarios - INFO - [Scenario 2] URL → Expected contains: inventory.html | Actual: https://www.saucedemo.com/inventory.html
+2025-08-18 19:26:27,033 - tests.test_swag_scenarios - INFO - [Scenario 2] Title → Expected: products | Actual: products
+2025-08-18 19:26:27,038 - conftest - INFO - Test test_scenario_2_valid_login completed in 3.03s

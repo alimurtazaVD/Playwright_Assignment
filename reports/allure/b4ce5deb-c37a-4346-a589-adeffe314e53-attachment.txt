@@ -1,0 +1,9 @@
+2025-08-18 19:26:19,413 - conftest - INFO - Starting test: test_scenario_1_invalid_password
+2025-08-18 19:26:19,559 - conftest - INFO - Setting up test environment
+2025-08-18 19:26:19,561 - conftest - INFO - Test environment setup completed
+2025-08-18 19:26:20,235 - conftest - INFO - Playwright instance started
+2025-08-18 19:26:20,724 - conftest - INFO - Browser chromium launched (headless: False)
+2025-08-18 19:26:21,150 - src.pages.base_page - INFO - Navigating to: https://www.saucedemo.com
+2025-08-18 19:26:23,843 - tests.test_swag_scenarios - INFO - [Scenario 1] Error visible → Expected: True | Actual: True
+2025-08-18 19:26:23,861 - tests.test_swag_scenarios - INFO - [Scenario 1] Error message → Expected contains: Epic sadface: Username and password do not match any user in this service | Actual: Epic sadface: Username and password do not match any user in this service
+2025-08-18 19:26:23,863 - conftest - INFO - Test test_scenario_1_invalid_password completed in 4.45s
