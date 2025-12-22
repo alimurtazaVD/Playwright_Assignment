@@ -106,55 +106,46 @@ def test_scenario_4_multiple_flow(page, base_url):
     3. Select About Option
     4. Assert the text on the page "Build apps users love with AI-driven quality"
     """
-    # 1. Go to dashboard
+
+    # 1. Login and reach inventory
     login = SwagLoginPage(page)
     login.open(base_url)
+
     creds = config_manager.get_test_data()["users"]
-    login.login(creds["standard_user"]["username"], creds["standard_user"]["password"]) 
+    login.login(
+        creds["standard_user"]["username"],
+        creds["standard_user"]["password"]
+    )
+
     page.wait_for_url("**/inventory.html")
 
-    # 2. Open menu option (from the left side)
+    # 2. Open menu
     inv = SwagInventoryPage(page)
     inv.open_menu()
 
-    # 3. Select About Option
+    # 3. Click About
     inv.click_about()
 
-    # 4. Assert the text on the page "Build apps users love with AI-driven quality"
-    # Wait for page to load completely
-    page.wait_for_load_state("networkidle")
-    
+    # 4. Validate About page content (CI-safe)
     expected_text = "Build apps users love with AI-driven quality"
-    
-    # Wait for the text to be visible and assert it
-    try:
-        page.wait_for_selector(f"text={expected_text}", timeout=10000)
-        text_element = page.locator(f"text={expected_text}").first
-        assert text_element.is_visible(), f"Expected text '{expected_text}' should be visible on the page"
-        
-        actual_text = text_element.text_content()
-        logger.info(f"[Scenario 4] Page text → Expected: {expected_text} | Actual: {actual_text}")
-        assert expected_text in actual_text, (
-            f"Expected text '{expected_text}' not found on page. Actual text: {actual_text}"
-        )
-        
-        logger.info("[Scenario 4] Successfully found the expected text on the page")
-        
-    except Exception as e:
-        # If the specific text is not found, let's check what text is actually on the page
-        page_content = page.text_content()
-        logger.info(f"[Scenario 4] Page content preview: {page_content[:500]}...")
-        logger.error(f"[Scenario 4] Text assertion failed: {e}")
-        
-        # Alternative: Check if we're on the right page by URL
-        current_url = page.url
-        logger.info(f"[Scenario 4] Current URL: {current_url}")
-        
-        # Check if we're on saucelabs.com
-        assert "saucelabs.com" in current_url, f"Expected to be on saucelabs.com, but current URL is: {current_url}"
-        
-        # For now, let's just verify we're on the right domain
-        logger.info("[Scenario 4] Successfully navigated to saucelabs.com domain")
-    
+
+    # Ensure navigation happened
+    page.wait_for_url("**saucelabs.com**", timeout=30000)
+
+    # Wait for meaningful content instead of networkidle
+    about_text = page.locator(f"text={expected_text}")
+
+    about_text.wait_for(state="visible", timeout=30000)
+
+    assert about_text.is_visible(), (
+        f"[Scenario 4] Expected text not visible: '{expected_text}'"
+    )
+
+    actual_text = about_text.text_content()
+    logger.info(
+        f"[Scenario 4] Assertion passed → Expected: '{expected_text}' | Actual: '{actual_text}'"
+    )
+
     logger.info("[Scenario 4] Successfully completed multiple flow test")
+
 
