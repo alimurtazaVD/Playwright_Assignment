@@ -1,0 +1,16 @@
+{
+  "name": "playwright-python-framework",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Python Playwright test framework with pytest, configured for CI.",
+  "scripts": {
+    "test": "pytest -v",
+    "test:swag_labs": "pytest tests/swag_labs -v",
+    "test:automation_store": "pytest tests/automation_store -v",
+    "test:automation_store:scenario1": "pytest tests/automation_store/test_scenario_1.py -v",
+    "test:automation_store:scenario2": "pytest tests/automation_store/test_scenario_2.py -v"
+  },
+  "devDependencies": {}
+}
+
+
