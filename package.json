@@ -8,7 +8,10 @@
     "test:swag_labs": "pytest tests/swag_labs -v",
     "test:automation_store": "pytest tests/automation_store -v",
     "test:automation_store:scenario1": "pytest tests/automation_store/test_scenario_1.py -v",
-    "test:automation_store:scenario2": "pytest tests/automation_store/test_scenario_2.py -v"
+    "test:automation_store:scenario2": "pytest tests/automation_store/test_scenario_2.py -v",
+    "test:cross-browser": "pytest -v -m cross_browser -n auto --html=reports/cross_browser_report.html --self-contained-html",
+    "test:cross-browser:swag": "pytest tests/swag_labs -v -m cross_browser -n auto --html=reports/cross_browser_report.html --self-contained-html",
+    "test:cross-browser:all": "pytest -v -m cross_browser -n auto --html=reports/cross_browser_report.html --self-contained-html -p no:warnings"
   },
   "devDependencies": {}
 }

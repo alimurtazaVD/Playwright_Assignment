@@ -17,4 +17,13 @@ class StoreHomePage(BasePage):
         self.page.locator(f"xpath={self.get_locator('dove_brand_link')}").click()
         self.wait_for_load_state()
 
+    def click_facebook_link(self) -> None:
+        facebook_link = self.page.locator(f"xpath={self.get_locator('facebook_link')}").first
+        if facebook_link.count() == 0:
+            facebook_link = self.page.get_by_role("link", name="Facebook", exact=False).first
+        if facebook_link.count() == 0:
+            facebook_link = self.page.locator("a[href*='facebook']").first
+        facebook_link.click(timeout=30000)
+        logger.info("Clicked Facebook link")
+
 

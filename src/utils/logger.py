@@ -1,7 +1,3 @@
-"""
-Structured Logging Utility for Playwright Test Framework
-"""
-
 import logging
 import json
 import sys
@@ -13,8 +9,6 @@ init(autoreset=True)
 
 
 class ColoredFormatter(logging.Formatter):
-    """Custom formatter with colored output for console"""
-    
     COLORS = {
         'DEBUG': Fore.CYAN,
         'INFO': Fore.GREEN,
@@ -37,8 +31,6 @@ class ColoredFormatter(logging.Formatter):
 
 
 class JSONFormatter(logging.Formatter):
-    """JSON formatter for structured logging"""
-    
     def format(self, record):
         log_entry = {
             'timestamp': datetime.now(timezone.utc).isoformat(),
@@ -65,8 +57,6 @@ def setup_logging(
     json_logging: bool = True,
     console_logging: bool = True
 ) -> None:
-    """Setup logging configuration"""
-    
     log_path = Path(log_file)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     
@@ -100,12 +90,10 @@ def setup_logging(
 
 
 def get_logger(name: str) -> logging.Logger:
-    """Get a logger instance"""
     return logging.getLogger(name)
 
 
 def initialize_logging():
-    """Initialize logging with default configuration"""
     setup_logging(
         log_level="INFO",
         log_file="logs/test_framework.log",

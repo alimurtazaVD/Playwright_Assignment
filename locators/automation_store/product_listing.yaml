@@ -1,7 +1,14 @@
 product_listing:
   sort_dropdown: "#sort"
-  product_items: ".product-thumb"
+  product_items: "//div[@class='product-thumb']"
   product_name: "h4 a"
   product_price: ".oneprice"
   product_link: "h4 a"
+  sale_price: ".oneprice"
+  old_price: ".//div[@class='pricetag jumbotron']//text()[contains(., '$')]"
+  out_of_stock: ".//span[contains(text(), 'Out of Stock')]"
+  add_to_cart_button: ".//a[contains(@title, 'Add to Cart')]"
+  list_view_button: "//button[@id='list']"
+  grid_view_button: "//a[@title='Grid']"
+  list_view_product_items: "//div[@class='product-list']//div[contains(@class, 'product-thumb')]"
 

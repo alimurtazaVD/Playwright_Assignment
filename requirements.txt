@@ -40,3 +40,4 @@ webdriver-manager>=4.0.0
 # Development & Testing
 pytest-cov>=4.1.0
 pytest-mock>=3.11.1
+pytest-bdd>=7.0.0

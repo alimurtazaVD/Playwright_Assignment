@@ -1,7 +1,3 @@
-"""
-Database Connectivity Utility for Playwright Test Framework
-Provides SQLAlchemy-based database operations and session management
-"""
 
 import os
 from typing import Dict, Any, List, Optional

@@ -1,5 +1,5 @@
 product_detail:
   size_dropdown: "form select"
   quantity_input: "form input[type='text']"
-  add_to_cart_link: "a:has-text('Add to Cart')"
+  add_to_cart_link: "//div[@class='contentpanel']//div[1]//div[2]//a[1]"
 
