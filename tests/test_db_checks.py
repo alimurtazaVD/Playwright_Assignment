@@ -1,6 +1,6 @@
 import pytest
 
-
+@pytest.mark.cross_browser
 @pytest.mark.parametrize("username,email", [("ali", "ali@example.com")])
 def test_user_exists(db, username, email):
     assert db is not None, "Database not initialized. Check config/config.yaml env->db settings."

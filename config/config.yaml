@@ -31,9 +31,9 @@ browsers:
 environments:
   dev:
     base_url: "https://www.saucedemo.com"
-    browser: "firefox"   # chromium | firefox | webkit
+    browser: "chromium"   # chromium | firefox | webkit
     headless: false
-    timeout: 45000
+    timeout: 50000
     retries: 1
     log_level: "DEBUG"
     db:

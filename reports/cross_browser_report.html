@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title id="head-title">cross_browser_report.html</title>
+      <style type="text/css">body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  vertical-align: top;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+#environment ul {
+  margin: 0;
+  padding: 0 20px;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+.col-links__extra {
+  margin-right: 3px;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.logwrapper {
+  max-height: 230px;
+  overflow-y: scroll;
+  background-color: #e6e6e6;
+}
+.logwrapper.expanded {
+  max-height: none;
+}
+.logwrapper.expanded .logexpander:after {
+  content: "collapse [-]";
+}
+.logwrapper .logexpander {
+  z-index: 1;
+  position: sticky;
+  top: 10px;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin: 10px 0 10px calc(100% - 80px);
+  cursor: pointer;
+  background-color: #e6e6e6;
+}
+.logwrapper .logexpander:after {
+  content: "expand [+]";
+}
+.logwrapper .logexpander:hover {
+  color: #000;
+  border-color: #000;
+}
+.logwrapper .log {
+  min-height: 40px;
+  position: relative;
+  top: -50px;
+  height: calc(100% + 50px);
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  padding: 5px;
+  padding-right: 80px;
+  white-space: pre-wrap;
+}
+
+div.media {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin: 0 5px;
+  overflow: hidden;
+  width: 320px;
+}
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+}
+
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
+}
+
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
+}
+
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+}
+.collapsible td:not(.col-links):hover::after {
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.col-result {
+  width: 130px;
+}
+.col-result:hover::after {
+  content: " (hide details)";
+}
+
+.col-result.collapsed:hover::after {
+  content: " (show details)";
+}
+
+#environment-header h2:hover::after {
+  content: " (hide details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#environment-header.collapsed h2:hover::after {
+  content: " (show details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+.sortable.desc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: -12.5px;
+  border: 10px solid #4caf50;
+  border-bottom: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.sortable.asc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: 12.5px;
+  border: 10px solid #4caf50;
+  border-top: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+.hidden, .summary__reload__button.hidden {
+  display: none;
+}
+
+.summary__data {
+  flex: 0 0 550px;
+}
+.summary__reload {
+  flex: 1 1;
+  display: flex;
+  justify-content: center;
+}
+.summary__reload__button {
+  flex: 0 0 300px;
+  display: flex;
+  color: white;
+  font-weight: bold;
+  background-color: #4caf50;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.summary__reload__button:hover {
+  background-color: #46a049;
+}
+.summary__spacer {
+  flex: 0 0 550px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
+}
+
+.filter__label {
+  margin-right: 10px;
+}
+
+      </style>
+    
+  </head>
+  <body>
+    <h1 id="title">cross_browser_report.html</h1>
+    <p>Report generated on 30-Dec-2025 at 12:11:18 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
+        v4.1.1</p>
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+      <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+    <template id="template_results-table__body--empty">
+      <tbody class="results-table-row">
+        <tr id="not-found-message">
+          <td colspan="4">No results found. Check the filters.</th>
+        </tr>
+    </template>
+    <template id="template_results-table__tbody">
+      <tbody class="results-table-row">
+        <tr class="collapsible">
+        </tr>
+        <tr class="extras-row">
+          <td class="extra" colspan="4">
+            <div class="extraHTML"></div>
+            <div class="media">
+              <div class="media-container">
+                  <div class="media-container__nav--left"><</div>
+                  <div class="media-container__viewport">
+                    <img src="" />
+                    <video controls>
+                      <source src="" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="media-container__nav--right">></div>
+                </div>
+                <div class="media__name"></div>
+                <div class="media__counter"></div>
+            </div>
+            <div class="logwrapper">
+              <div class="logexpander"></div>
+              <div class="log"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+    <!-- END TEMPLATES -->
+    <div class="summary">
+      <div class="summary__data">
+        <h2>Summary</h2>
+        <div class="additional-summary prefix">
+        </div>
+        <p class="run-count">11 tests took 00:13:54.</p>
+        <p class="filter">(Un)check the boxes to filter the results.</p>
+        <div class="summary__reload">
+          <div class="summary__reload__button hidden" onclick="location.reload()">
+            <div>There are still tests running. <br />Reload this page to get the latest results!</div>
+          </div>
+        </div>
+        <div class="summary__spacer"></div>
+        <div class="controls">
+          <div class="filters">
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="failed" disabled/>
+            <span class="failed">0 Failed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="passed" />
+            <span class="passed">11 Passed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="skipped" disabled/>
+            <span class="skipped">0 Skipped,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xfailed" disabled/>
+            <span class="xfailed">0 Expected failures,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xpassed" disabled/>
+            <span class="xpassed">0 Unexpected passes,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="error" disabled/>
+            <span class="error">0 Errors,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="rerun" disabled/>
+            <span class="rerun">0 Reruns</span>
+          </div>
+          <div class="collapse">
+            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
+          </div>
+        </div>
+      </div>
+      <div class="additional-summary summary">
+      </div>
+      <div class="additional-summary postfix">
+      </div>
+    </div>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable" data-column-type="result">Result</th>
+          <th class="sortable" data-column-type="testId">Test</th>
+          <th class="sortable" data-column-type="duration">Duration</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+    </table>
+  </body>
+  <footer>
+    <div id="data-container" data-jsonblob="{&#34;environment&#34;: {&#34;Python&#34;: &#34;3.14.0&#34;, &#34;Platform&#34;: &#34;Windows-11-10.0.26200-SP0&#34;, &#34;Packages&#34;: {&#34;pytest&#34;: &#34;9.0.2&#34;, &#34;pluggy&#34;: &#34;1.6.0&#34;}, &#34;Plugins&#34;: {&#34;allure-pytest&#34;: &#34;2.15.2&#34;, &#34;Faker&#34;: &#34;40.1.0&#34;, &#34;base-url&#34;: &#34;2.1.0&#34;, &#34;bdd&#34;: &#34;8.1.0&#34;, &#34;cov&#34;: &#34;7.0.0&#34;, &#34;html&#34;: &#34;4.1.1&#34;, &#34;metadata&#34;: &#34;3.1.1&#34;, &#34;mock&#34;: &#34;3.15.1&#34;, &#34;playwright&#34;: &#34;0.7.2&#34;, &#34;rerunfailures&#34;: &#34;16.1&#34;, &#34;xdist&#34;: &#34;3.8.0&#34;}, &#34;JAVA_HOME&#34;: &#34;C:\\Program Files\\Java\\jdk-25&#34;, &#34;Base URL&#34;: &#34;&#34;}, &#34;tests&#34;: {&#34;tests/automation_store/step_definitions/test_scenario_1_bdd.py::test_scenario_1_dove_brand_bdd&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/step_definitions/test_scenario_1_bdd.py::test_scenario_1_dove_brand_bdd&#34;, &#34;duration&#34;: &#34;00:00:37&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/step_definitions/test_scenario_1_bdd.py::test_scenario_1_dove_brand_bdd&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:37&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 11:57:24,669 - conftest - INFO - Starting test: test_scenario_1_dove_brand_bdd\n2025-12-30 11:57:24,760 - conftest - INFO - Setting up test environment\n2025-12-30 11:57:24,761 - conftest - INFO - Test environment setup completed\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_1_dove_brand_bdd\nINFO     conftest:conftest.py:278 Setting up test environment\nINFO     conftest:conftest.py:289 Test environment setup completed\n\n----------------------------- Captured stdout call -----------------------------\n2025-12-30 11:57:25,131 - conftest - INFO - Playwright instance started\n2025-12-30 11:57:25,576 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 11:57:25,729 - conftest - INFO - Cross-browser test page created for browser: unknown\n2025-12-30 11:57:25,730 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n2025-12-30 11:57:35,494 - automation_store.step_definitions.steps_automation_store - INFO - Successfully logged into automation test store\n2025-12-30 11:57:38,017 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to home page\n2025-12-30 11:57:39,915 - automation_store.step_definitions.steps_automation_store - INFO - Clicked on DOVE brand\n2025-12-30 11:57:48,944 - automation_store.step_definitions.steps_automation_store - INFO - Selected newest product: \n2025-12-30 11:57:52,373 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 11:57:52,374 - automation_store.step_definitions.steps_automation_store - INFO - Added product to cart\n2025-12-30 11:57:54,165 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to cart page\n2025-12-30 11:57:54,241 - automation_store.step_definitions.steps_automation_store - INFO - Verified cart has 8 item(s)\n2025-12-30 11:57:56,493 - automation_store.step_definitions.steps_automation_store - INFO - Verified product &amp;#x27;&amp;#x27; is in cart\n2025-12-30 11:57:58,771 - automation_store.step_definitions.steps_automation_store - INFO - Verified product quantity is 10\n2025-12-30 11:58:01,079 - automation_store.step_definitions.steps_automation_store - INFO - Verified product price is displayed: $7.20\n\n------------------------------ Captured log call -------------------------------\nINFO     conftest:conftest.py:80 Playwright instance started\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:25 Successfully logged into automation test store\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:33 Navigated to home page\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:41 Clicked on DOVE brand\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:52 Selected newest product: \nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:60 Added product to cart\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:68 Navigated to cart page\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:77 Verified cart has 8 item(s)\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:88 Verified product &amp;#x27;&amp;#x27; is in cart\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:100 Verified product quantity is 10\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:112 Verified product price is displayed: $7.20\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 11:58:01,080 - conftest - INFO - Test test_scenario_1_dove_brand_bdd completed in 36.41s\n2025-12-30 11:58:01,384 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_1_dove_brand_bdd completed in 36.41s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/step_definitions/test_scenario_2_bdd.py::test_scenario_2_apparel_shoes_bdd&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/step_definitions/test_scenario_2_bdd.py::test_scenario_2_apparel_shoes_bdd&#34;, &#34;duration&#34;: &#34;00:03:10&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/step_definitions/test_scenario_2_bdd.py::test_scenario_2_apparel_shoes_bdd&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:03:10&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 11:58:01,386 - conftest - INFO - Starting test: test_scenario_2_apparel_shoes_bdd\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_2_apparel_shoes_bdd\n\n----------------------------- Captured stdout call -----------------------------\n2025-12-30 11:58:01,560 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 11:58:01,718 - conftest - INFO - Cross-browser test page created for browser: unknown\n2025-12-30 11:58:01,720 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n2025-12-30 11:58:14,564 - automation_store.step_definitions.steps_automation_store - INFO - Successfully logged into automation test store\n2025-12-30 11:58:17,081 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to home page\n2025-12-30 11:58:18,746 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to APPAREL &amp;amp; ACCESSORIES category\n2025-12-30 11:58:20,397 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to T-shirts subcategory\n2025-12-30 11:58:22,460 - automation_store.step_definitions.steps_automation_store - INFO - Sorted products by price low to high\n2025-12-30 11:58:24,638 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 11:58:24,750 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 11:58:24,854 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 2. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 11:58:49,751 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 11:59:21,135 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 11:59:52,134 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 11:59:52,134 - automation_store.step_definitions.steps_automation_store - INFO - Added first 3 products to cart\n2025-12-30 11:59:54,902 - automation_store.step_definitions.steps_automation_store - INFO - Navigated back to home page\n2025-12-30 11:59:56,564 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to Apparel &amp;amp; accessories category\n2025-12-30 11:59:58,196 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to Shoes subcategory\n2025-12-30 12:00:00,252 - automation_store.step_definitions.steps_automation_store - INFO - Sorted products by price high to low\n2025-12-30 12:00:07,495 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 12:00:07,596 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 12:00:33,420 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:01:04,979 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:01:04,979 - automation_store.step_definitions.steps_automation_store - INFO - Added 2 highest priced shoes to cart with quantity 1\n2025-12-30 12:01:06,725 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to cart page\n2025-12-30 12:01:06,802 - automation_store.step_definitions.steps_automation_store - INFO - Verified cart has at least 5 items\n2025-12-30 12:01:09,063 - automation_store.step_definitions.steps_automation_store - INFO - Verified total quantity is at least 5\n2025-12-30 12:01:11,307 - automation_store.step_definitions.steps_automation_store - INFO - Verified 2 shoes items are present in cart\n\n------------------------------ Captured log call -------------------------------\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:25 Successfully logged into automation test store\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:33 Navigated to home page\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:120 Navigated to APPAREL &amp;amp; ACCESSORIES category\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:128 Navigated to T-shirts subcategory\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:136 Sorted products by price low to high\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 2. Name found: &amp;#x27;&amp;#x27;\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:161 Added first 3 products to cart\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:169 Navigated back to home page\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:120 Navigated to Apparel &amp;amp; accessories category\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:128 Navigated to Shoes subcategory\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:177 Sorted products by price high to low\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:208 Added 2 highest priced shoes to cart with quantity 1\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:68 Navigated to cart page\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:221 Verified cart has at least 5 items\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:234 Verified total quantity is at least 5\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:252 Verified 2 shoes items are present in cart\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:01:11,308 - conftest - INFO - Test test_scenario_2_apparel_shoes_bdd completed in 189.92s\n2025-12-30 12:01:11,666 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_2_apparel_shoes_bdd completed in 189.92s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/step_definitions/test_scenario_4_bdd.py::test_scenario_4_men_product_starts_with_m_bdd&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/step_definitions/test_scenario_4_bdd.py::test_scenario_4_men_product_starts_with_m_bdd&#34;, &#34;duration&#34;: &#34;00:00:46&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/step_definitions/test_scenario_4_bdd.py::test_scenario_4_men_product_starts_with_m_bdd&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:46&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:01:11,667 - conftest - INFO - Starting test: test_scenario_4_men_product_starts_with_m_bdd\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_4_men_product_starts_with_m_bdd\n\n----------------------------- Captured stdout call -----------------------------\n2025-12-30 12:01:11,840 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:01:11,988 - conftest - INFO - Cross-browser test page created for browser: unknown\n2025-12-30 12:01:11,990 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n2025-12-30 12:01:21,271 - automation_store.step_definitions.steps_automation_store - INFO - Successfully logged into automation test store\n2025-12-30 12:01:23,764 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to home page\n2025-12-30 12:01:25,360 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to Men section\n2025-12-30 12:01:31,458 - automation_store.step_definitions.steps_automation_store - INFO - Scrolled down to load all products\n2025-12-30 12:01:31,480 - automation_store.step_definitions.steps_automation_store - INFO - Found 2 products starting with &amp;#x27;M&amp;#x27;: Men+Care Clean Comfort Deodorant, Men+Care Active Clean Shower Tool\n2025-12-30 12:01:38,125 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:01:38,125 - automation_store.step_definitions.steps_automation_store - INFO - Added first product &amp;#x27;Men+Care Clean Comfort Deodorant&amp;#x27; to cart\n2025-12-30 12:01:50,933 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:01:50,933 - automation_store.step_definitions.steps_automation_store - INFO - Added second product &amp;#x27;Men+Care Active Clean Shower Tool&amp;#x27; to cart\n2025-12-30 12:01:52,589 - automation_store.step_definitions.steps_automation_store - INFO - Navigated to cart page\n2025-12-30 12:01:52,655 - automation_store.step_definitions.steps_automation_store - INFO - Verified cart has at least 2 items: 8\n2025-12-30 12:01:54,902 - automation_store.step_definitions.steps_automation_store - INFO - Verified 2 products starting with &amp;#x27;M&amp;#x27; are in cart\n2025-12-30 12:01:57,404 - automation_store.step_definitions.steps_automation_store - INFO - Verified both products starting with &amp;#x27;M&amp;#x27; are in cart with correct details\n\n------------------------------ Captured log call -------------------------------\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:25 Successfully logged into automation test store\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:33 Navigated to home page\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:260 Navigated to Men section\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:272 Scrolled down to load all products\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:304 Found 2 products starting with &amp;#x27;M&amp;#x27;: Men+Care Clean Comfort Deodorant, Men+Care Active Clean Shower Tool\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:331 Added first product &amp;#x27;Men+Care Clean Comfort Deodorant&amp;#x27; to cart\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:367 Added second product &amp;#x27;Men+Care Active Clean Shower Tool&amp;#x27; to cart\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:68 Navigated to cart page\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:377 Verified cart has at least 2 items: 8\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:389 Verified 2 products starting with &amp;#x27;M&amp;#x27; are in cart\nINFO     automation_store.step_definitions.steps_automation_store:steps_automation_store.py:409 Verified both products starting with &amp;#x27;M&amp;#x27; are in cart with correct details\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:01:57,405 - conftest - INFO - Test test_scenario_4_men_product_starts_with_m_bdd completed in 45.74s\n2025-12-30 12:01:57,849 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_4_men_product_starts_with_m_bdd completed in 45.74s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_1.py::test_scenario_1_dove_brand_newest_item_cart[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_1.py::test_scenario_1_dove_brand_newest_item_cart[chromium]&#34;, &#34;duration&#34;: &#34;00:00:32&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_1.py::test_scenario_1_dove_brand_newest_item_cart[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:32&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:01:57,851 - conftest - INFO - Starting test: test_scenario_1_dove_brand_newest_item_cart[chromium]\n2025-12-30 12:01:58,029 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:01:58,256 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_1_dove_brand_newest_item_cart[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 1: DOVE BRAND NEWEST ITEM TO CART\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:01:58,259 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n[PASS] Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n[PASS] Navigated to Home page\n[STEP 5] Clicking DOVE brand...\n[PASS] Navigated to DOVE brand products\n\n[STEP 6] Finding newest product...\n[RESULT] Newest product found:\n  - Name: \n  - Price: $6.70\n\n[STEP 7] Clicking newest product...\n[PASS] Navigated to product detail page\n[STEP 8] Adding product to cart...\n2025-12-30 12:02:24,922 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n[PASS] Product added to cart successfully\n\n[STEP 9] Navigating to cart page...\n[PASS] Navigated to cart page\n\n[VERIFICATION] Verifying cart contents...\n[RESULT] Total items in cart: 8\n[PASS] Cart contains at least 1 item\n[PASS] Product &amp;#x27;&amp;#x27; found in cart\n[RESULT] Product quantity: 11\n[PASS] Quantity verification passed\n[RESULT] Product price: $7.20\n[PASS] Price verification passed\n\n======================================================================\nTEST SUMMARY\n======================================================================\n  Product Name: \n  Product Price: $6.70\n  Items in Cart: 8\n  Cart Quantity: 11\n  Cart Price: $7.20\n======================================================================\n[SUCCESS] TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:02:29,194 - conftest - INFO - Test test_scenario_1_dove_brand_newest_item_cart[chromium] completed in 31.34s\n2025-12-30 12:02:29,494 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_1_dove_brand_newest_item_cart[chromium] completed in 31.34s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_2.py::test_scenario_2_apparel_shoes_cart[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_2.py::test_scenario_2_apparel_shoes_cart[chromium]&#34;, &#34;duration&#34;: &#34;00:03:09&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_2.py::test_scenario_2_apparel_shoes_cart[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:03:09&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:02:29,496 - conftest - INFO - Starting test: test_scenario_2_apparel_shoes_cart[chromium]\n2025-12-30 12:02:29,683 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:02:29,822 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_2_apparel_shoes_cart[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 2: APPAREL &amp;amp; SHOES CART TEST\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:02:29,824 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n[PASS] Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n[PASS] Navigated to Home page\n\n============================================================\nPART 1: T-SHIRTS SECTION\n============================================================\n\n[STEP 5] Navigating to APPAREL &amp;amp; ACCESSORIES &amp;gt; T-shirts...\n[PASS] Navigated to T-shirts category\n[STEP 6] Sorting by price (Low to High)...\n[PASS] Sorted by price low to high\n[STEP 7] Getting 3 lowest priced products...\n2025-12-30 12:02:53,085 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 12:02:53,222 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 12:02:53,552 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 2. Name found: &amp;#x27;&amp;#x27;\n[RESULT] Found 0 products\n\n[STEP 8] Adding 3 T-shirts to cart (quantity: 1 each)...\n  - Adding product 1/3...\n2025-12-30 12:03:18,278 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n  [PASS] Added product 1 to cart\n  - Adding product 2/3...\n2025-12-30 12:03:49,815 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n  [PASS] Added product 2 to cart\n  - Adding product 3/3...\n2025-12-30 12:04:21,220 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n  [PASS] Added product 3 to cart\n[PASS] Successfully added 3 T-shirts to cart\n\n============================================================\nPART 2: SHOES SECTION\n============================================================\n\n[STEP 9] Navigating to Home page...\n[PASS] Navigated to Home page\n[STEP 10] Navigating to Apparel &amp;amp; accessories &amp;gt; Shoes...\n[PASS] Navigated to Shoes category\n[STEP 11] Sorting by price (High to Low)...\n[PASS] Sorted by price high to low\n[STEP 12] Getting 2 highest priced shoes...\n2025-12-30 12:04:35,308 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\n2025-12-30 12:04:35,431 - src.pages.automation_store.product_listing_page - WARNING - Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\n[RESULT] Found 0 highest priced shoes\n\n[STEP 13] Adding 2 highest priced shoes to cart (quantity: 1 each)...\n  - Adding shoe 1/2...\n2025-12-30 12:05:00,311 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n  [PASS] Added Shoes_Product_1 (Price: N/A, Qty: 1) to cart\n  - Adding shoe 2/2...\n2025-12-30 12:05:31,370 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n  [PASS] Added Shoes_Product_2 (Price: N/A, Qty: 1) to cart\n[PASS] Successfully added 2 highest priced shoes to cart\n\n============================================================\nPART 3: CART VERIFICATION\n============================================================\n\n[STEP 14] Navigating to cart page...\n[PASS] Navigated to cart page\n\n[STEP 15] Verifying cart contents...\n[RESULT] Total items in cart: 8\n[RESULT] Expected items: 5\n[PASS] Cart contains at least 5 items\n[RESULT] Total quantity in cart: 48\n[RESULT] Expected total quantity: 5\n[PASS] Total quantity verification passed\n\n[STEP 16] Verifying shoes items in cart...\n[RESULT] Found 8 items in cart\n[PASS] At least 2 shoes items found in cart\n\n[STEP 17] Verifying shoes items details...\n  Shoes Item 1:\n    - Name: Men+Care Clean Comfort Deodorant\n    - Quantity: 11\n    - Price: $7.20\n    [PASS] Shoes item 1 verification passed\n  Shoes Item 2:\n    - Name: Men+Care Active Clean Shower Tool\n    - Quantity: 11\n    - Price: $6.00\n    [PASS] Shoes item 2 verification passed\n\n======================================================================\nTEST SUMMARY\n======================================================================\n  T-shirts added: 3 (quantity: 1 each)\n  Shoes added: 2 (quantity: 1 each)\n  Total items in cart: 8\n  Total quantity: 48\n  Expected total quantity: 5\n  Shoes items verified: 8\n======================================================================\n[SUCCESS] TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 2. Name found: &amp;#x27;&amp;#x27;\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 0. Name found: &amp;#x27;&amp;#x27;\nWARNING  src.pages.automation_store.product_listing_page:product_listing_page.py:165 Could not extract valid product name for product at index 1. Name found: &amp;#x27;&amp;#x27;\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:05:38,041 - conftest - INFO - Test test_scenario_2_apparel_shoes_cart[chromium] completed in 188.55s\n2025-12-30 12:05:38,505 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_2_apparel_shoes_cart[chromium] completed in 188.55s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_3.py::test_scenario_3_skincare_sale_items[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_3.py::test_scenario_3_skincare_sale_items[chromium]&#34;, &#34;duration&#34;: &#34;00:01:15&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_3.py::test_scenario_3_skincare_sale_items[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:01:15&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:05:38,507 - conftest - INFO - Starting test: test_scenario_3_skincare_sale_items[chromium]\n2025-12-30 12:05:38,727 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:05:38,925 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_3_skincare_sale_items[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 3: SKINCARE SALE ITEMS TEST\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:05:38,929 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n\u2713 Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n\u2713 Navigated to Home page\n[STEP 5] Clicking Skincare category...\n\u2713 Navigated to Skincare category\n\n======================================================================\nSCENARIO 3: SKINCARE SALE ITEMS ANALYSIS\n======================================================================\n\n[ANALYSIS] Counting sale items...\n2025-12-30 12:05:55,208 - src.pages.automation_store.product_listing_page - INFO - Found 6 sale items using span.sale class\n2025-12-30 12:05:55,208 - src.pages.automation_store.product_listing_page - INFO - Total sale items found: 6\n\u2713 [RESULT] Total items on sale: 6\n2025-12-30 12:05:55,208 - automation_store.test_scenario_3 - INFO - Total items on sale: 6\n[ANALYSIS] Checking for sale items that are out of stock...\n\u2713 [RESULT] Items on sale and also out of stock: 0\n2025-12-30 12:05:57,317 - automation_store.test_scenario_3 - INFO - Items on sale and also out of stock: 0\n[ANALYSIS] Getting detailed sale items information...\n\n\u2713 [RESULT] Found 3 sale items:\n----------------------------------------------------------------------\n  1. Absolue Eye Precious Cells\n     Price: $89.00\n  2. Creme Precieuse Nuit 50ml\n     Price: $220.00\n  3. Flash Bronzer Body Gel\n     Price: $29.00\n----------------------------------------------------------------------\n2025-12-30 12:06:00,610 - automation_store.test_scenario_3 - INFO - Sale items list: [{&amp;#x27;name&amp;#x27;: &amp;#x27;Absolue Eye Precious Cells\\t\\t\\t\\t\\t\\t\\t(427847)&amp;#x27;, &amp;#x27;price&amp;#x27;: &amp;#x27;$89.00&amp;#x27;, &amp;#x27;original_index&amp;#x27;: 5, &amp;#x27;index&amp;#x27;: 0}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Creme Precieuse Nuit 50ml\\t\\t\\t\\t\\t\\t\\t(BVLG003)&amp;#x27;, &amp;#x27;price&amp;#x27;: &amp;#x27;$220.00&amp;#x27;, &amp;#x27;original_index&amp;#x27;: 6, &amp;#x27;index&amp;#x27;: 1}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Flash Bronzer Body Gel\\t\\t\\t\\t\\t\\t\\t(463686)&amp;#x27;, &amp;#x27;price&amp;#x27;: &amp;#x27;$29.00&amp;#x27;, &amp;#x27;original_index&amp;#x27;: 8, &amp;#x27;index&amp;#x27;: 2}]\n\n[ACTION] Adding 3 sale items to cart...\n----------------------------------------------------------------------\n2025-12-30 12:06:03,903 - src.pages.automation_store.product_listing_page - INFO - Found 3 sale items to add to cart\n2025-12-30 12:06:15,184 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:06:17,198 - src.pages.automation_store.product_listing_page - INFO - Added Absolue Eye Precious Cells\t\t\t\t\t\t\t(427847) to cart\n2025-12-30 12:06:28,304 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:06:30,319 - src.pages.automation_store.product_listing_page - INFO - Added Creme Precieuse Nuit 50ml\t\t\t\t\t\t\t(BVLG003) to cart\n2025-12-30 12:06:41,316 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:06:43,329 - src.pages.automation_store.product_listing_page - INFO - Added Flash Bronzer Body Gel\t\t\t\t\t\t\t(463686) to cart\n----------------------------------------------------------------------\n\u2713 [SUCCESS] Successfully added 3 sale items to cart\n2025-12-30 12:06:43,329 - automation_store.test_scenario_3 - INFO - Added 3 sale items to cart\n\n[ACTION] Navigating to cart page...\n\u2713 Navigated to cart page\n[VERIFICATION] Retrieving cart information...\n\n\u2713 [CART SUMMARY]\n----------------------------------------------------------------------\n  Total items in cart: 11\n  Total quantity: 51\n  Total amount: $1,224.12\n----------------------------------------------------------------------\n2025-12-30 12:06:47,534 - automation_store.test_scenario_3 - INFO - Total items in cart: 11\n2025-12-30 12:06:47,534 - automation_store.test_scenario_3 - INFO - Total quantity: 51\n2025-12-30 12:06:47,534 - automation_store.test_scenario_3 - INFO - Total amount: $1,224.12\n\n\u2713 [CART ITEMS DETAILS] (11 items):\n----------------------------------------------------------------------\n  1. Men+Care Clean Comfort Deodorant\n     Quantity: 11 | Price: $7.20\n  2. Men+Care Active Clean Shower Tool\n     Quantity: 11 | Price: $6.00\n  3. Dove Men +Care Body Wash\n     Quantity: 11 | Price: $6.70\n  4. Jersey Cotton Striped Polo Shirt\n     Quantity: 3 | Price: $7.75\n  5. Fruit of the Loom T-Shirts 5 Pack - Super Premium\n     Quantity: 3 | Price: $9.99\n  6. Casual 3/4 Sleeve Baseball T-Shirt\n     Quantity: 3 | Price: $16.00\n  7. Fiorella Purple Peep Toes\n     Quantity: 3 | Price: $110.00\n  8. Ruby Shoo Womens Jada T-Bar\n     Quantity: 3 | Price: $78.00\n  9. Absolue Eye Precious Cells\n     Quantity: 1 | Price: $89.00\n  10. Creme Precieuse Nuit 50ml\n     Quantity: 1 | Price: $220.00\n  11. Flash Bronzer Body Gel\n     Quantity: 1 | Price: $29.00\n----------------------------------------------------------------------\n2025-12-30 12:06:49,927 - automation_store.test_scenario_3 - INFO - Cart items list: [{&amp;#x27;name&amp;#x27;: &amp;#x27;Men+Care Clean Comfort Deodorant&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 11, &amp;#x27;price&amp;#x27;: &amp;#x27;$7.20&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Men+Care Active Clean Shower Tool&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 11, &amp;#x27;price&amp;#x27;: &amp;#x27;$6.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Dove Men +Care Body Wash&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 11, &amp;#x27;price&amp;#x27;: &amp;#x27;$6.70&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Jersey Cotton Striped Polo Shirt&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$7.75&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Fruit of the Loom T-Shirts 5 Pack - Super Premium&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$9.99&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Casual 3/4 Sleeve Baseball T-Shirt&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$16.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Fiorella Purple Peep Toes&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$110.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Ruby Shoo Womens Jada T-Bar&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$78.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Absolue Eye Precious Cells&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 1, &amp;#x27;price&amp;#x27;: &amp;#x27;$89.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Creme Precieuse Nuit 50ml&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 1, &amp;#x27;price&amp;#x27;: &amp;#x27;$220.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Flash Bronzer Body Gel&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 1, &amp;#x27;price&amp;#x27;: &amp;#x27;$29.00&amp;#x27;}]\n\n======================================================================\nTEST SUMMARY &amp;amp; VERIFICATION\n======================================================================\n  Sale items found: 6\n  Sale items out of stock: 0\n  Items added to cart: 3\n  Items in cart: 11\n  Total cart quantity: 51\n  Total cart amount: $1,224.12\n======================================================================\n\n[VERIFICATION] Running assertions...\n  \u2713 PASS: Cart contains at least 3 items\n  \u2713 PASS: Total quantity is at least 3\n  \u2713 PASS: Total amount is present: $1,224.12\n  \u2713 PASS: All 3 sale items are in cart\n\n[ACTION] Proceeding to checkout...\n2025-12-30 12:06:53,225 - src.pages.automation_store.cart_page - INFO - Checkout button clicked successfully\n\u2713 [SUCCESS] Checkout completed successfully\n2025-12-30 12:06:53,225 - automation_store.test_scenario_3 - INFO - Checkout completed\n\n======================================================================\n\u2713 TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:246 Found 6 sale items using span.sale class\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:253 Total sale items found: 6\nINFO     automation_store.test_scenario_3:test_scenario_3.py:58 Total items on sale: 6\nINFO     automation_store.test_scenario_3:test_scenario_3.py:63 Items on sale and also out of stock: 0\nINFO     automation_store.test_scenario_3:test_scenario_3.py:75 Sale items list: [{&amp;#x27;name&amp;#x27;: &amp;#x27;Absolue Eye Precious Cells\\t\\t\\t\\t\\t\\t\\t(427847)&amp;#x27;, &amp;#x27;price&amp;#x27;: &amp;#x27;$89.00&amp;#x27;, &amp;#x27;original_index&amp;#x27;: 5, &amp;#x27;index&amp;#x27;: 0}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Creme Precieuse Nuit 50ml\\t\\t\\t\\t\\t\\t\\t(BVLG003)&amp;#x27;, &amp;#x27;price&amp;#x27;: &amp;#x27;$220.00&amp;#x27;, &amp;#x27;original_index&amp;#x27;: 6, &amp;#x27;index&amp;#x27;: 1}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Flash Bronzer Body Gel\\t\\t\\t\\t\\t\\t\\t(463686)&amp;#x27;, &amp;#x27;price&amp;#x27;: &amp;#x27;$29.00&amp;#x27;, &amp;#x27;original_index&amp;#x27;: 8, &amp;#x27;index&amp;#x27;: 2}]\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:350 Found 3 sale items to add to cart\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:393 Added Absolue Eye Precious Cells\t\t\t\t\t\t\t(427847) to cart\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:393 Added Creme Precieuse Nuit 50ml\t\t\t\t\t\t\t(BVLG003) to cart\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:393 Added Flash Bronzer Body Gel\t\t\t\t\t\t\t(463686) to cart\nINFO     automation_store.test_scenario_3:test_scenario_3.py:87 Added 3 sale items to cart\nINFO     automation_store.test_scenario_3:test_scenario_3.py:112 Total items in cart: 11\nINFO     automation_store.test_scenario_3:test_scenario_3.py:113 Total quantity: 51\nINFO     automation_store.test_scenario_3:test_scenario_3.py:114 Total amount: $1,224.12\nINFO     automation_store.test_scenario_3:test_scenario_3.py:124 Cart items list: [{&amp;#x27;name&amp;#x27;: &amp;#x27;Men+Care Clean Comfort Deodorant&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 11, &amp;#x27;price&amp;#x27;: &amp;#x27;$7.20&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Men+Care Active Clean Shower Tool&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 11, &amp;#x27;price&amp;#x27;: &amp;#x27;$6.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Dove Men +Care Body Wash&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 11, &amp;#x27;price&amp;#x27;: &amp;#x27;$6.70&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Jersey Cotton Striped Polo Shirt&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$7.75&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Fruit of the Loom T-Shirts 5 Pack - Super Premium&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$9.99&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Casual 3/4 Sleeve Baseball T-Shirt&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$16.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Fiorella Purple Peep Toes&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$110.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Ruby Shoo Womens Jada T-Bar&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 3, &amp;#x27;price&amp;#x27;: &amp;#x27;$78.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Absolue Eye Precious Cells&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 1, &amp;#x27;price&amp;#x27;: &amp;#x27;$89.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Creme Precieuse Nuit 50ml&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 1, &amp;#x27;price&amp;#x27;: &amp;#x27;$220.00&amp;#x27;}, {&amp;#x27;name&amp;#x27;: &amp;#x27;Flash Bronzer Body Gel&amp;#x27;, &amp;#x27;quantity&amp;#x27;: 1, &amp;#x27;price&amp;#x27;: &amp;#x27;$29.00&amp;#x27;}]\nINFO     src.pages.automation_store.cart_page:cart_page.py:153 Checkout button clicked successfully\nINFO     automation_store.test_scenario_3:test_scenario_3.py:156 Checkout completed\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:06:53,227 - conftest - INFO - Test test_scenario_3_skincare_sale_items[chromium] completed in 74.72s\n2025-12-30 12:06:53,652 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_3_skincare_sale_items[chromium] completed in 74.72s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_4.py::test_scenario_4_men_product_starts_with_m[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_4.py::test_scenario_4_men_product_starts_with_m[chromium]&#34;, &#34;duration&#34;: &#34;00:00:45&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_4.py::test_scenario_4_men_product_starts_with_m[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:45&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:06:53,655 - conftest - INFO - Starting test: test_scenario_4_men_product_starts_with_m[chromium]\n2025-12-30 12:06:53,873 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:06:54,075 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_4_men_product_starts_with_m[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 4: MEN SECTION - PRODUCT NAME STARTS WITH &amp;#x27;M&amp;#x27;\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:06:54,078 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n[PASS] Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n[PASS] Navigated to Home page\n\n[STEP 5] Navigating to Men section...\n[PASS] Navigated to Men section\n\n[STEP 6] Scrolling down to load all products...\n[PASS] Scrolled down and back up to load products\n\n[STEP 7] Finding products whose name starts with &amp;#x27;M&amp;#x27;...\n[RESULT] Found 2 products starting with &amp;#x27;M&amp;#x27;:\n  1. Men+Care Clean Comfort Deodorant\n  2. Men+Care Active Clean Shower Tool\n\n[STEP 8] Adding first product &amp;#x27;Men+Care Clean Comfort Deodorant&amp;#x27; to cart...\n[PASS] Navigated to product detail page\n2025-12-30 12:07:20,865 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n[PASS] Added &amp;#x27;Men+Care Clean Comfort Deodorant&amp;#x27; to cart\n\n[STEP 9] Adding second product &amp;#x27;Men+Care Active Clean Shower Tool&amp;#x27; to cart...\n[PASS] Navigated to product detail page\n2025-12-30 12:07:33,897 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n[PASS] Added &amp;#x27;Men+Care Active Clean Shower Tool&amp;#x27; to cart\n\n[STEP 10] Navigating to cart page...\n[PASS] Navigated to cart page\n\n[VERIFICATION] Verifying cart contents...\n[RESULT] Total items in cart: 11\n[PASS] Cart contains at least 2 items\n\n[STEP 11] Verifying products starting with &amp;#x27;M&amp;#x27; are in cart...\n[RESULT] Found product: Men+Care Clean Comfort Deodorant\n  - Quantity: 12\n  - Price: $7.20\n[RESULT] Found product: Men+Care Active Clean Shower Tool\n  - Quantity: 12\n  - Price: $6.00\n[PASS] Found 2 product(s) starting with &amp;#x27;M&amp;#x27;\n[PASS] Product 1 &amp;#x27;Men+Care Clean Comfort Deodorant&amp;#x27; starts with &amp;#x27;M&amp;#x27;\n[PASS] Product 2 &amp;#x27;Men+Care Active Clean Shower Tool&amp;#x27; starts with &amp;#x27;M&amp;#x27;\n\n======================================================================\nTEST SUMMARY\n======================================================================\n  Product 1: Men+Care Clean Comfort Deodorant\n  Product 2: Men+Care Active Clean Shower Tool\n  Items in Cart: 11\n  Products Starting with &amp;#x27;M&amp;#x27;: 2\n======================================================================\n[SUCCESS] TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:07:38,282 - conftest - INFO - Test test_scenario_4_men_product_starts_with_m[chromium] completed in 44.63s\n2025-12-30 12:07:38,713 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_4_men_product_starts_with_m[chromium] completed in 44.63s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_5.py::test_scenario_5_fragrance_sale_items_list_view[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_5.py::test_scenario_5_fragrance_sale_items_list_view[chromium]&#34;, &#34;duration&#34;: &#34;00:01:24&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_5.py::test_scenario_5_fragrance_sale_items_list_view[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:01:24&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:07:38,715 - conftest - INFO - Starting test: test_scenario_5_fragrance_sale_items_list_view[chromium]\n2025-12-30 12:07:38,940 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:07:39,123 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_5_fragrance_sale_items_list_view[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 5: FRAGRANCE SALE ITEMS - LIST VIEW\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:07:39,126 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n[PASS] Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n[PASS] Navigated to Home page\n\n[STEP 5] Navigating to Fragrance section...\n[PASS] Navigated to Fragrance category\n\n[STEP 6] Scrolling to bottom to find sale items...\n[PASS] Scrolled to bottom and back\n\n[STEP 7] Finding sale items in Fragrance section...\n2025-12-30 12:08:03,929 - src.pages.automation_store.product_listing_page - INFO - Found 2 sale items using span.sale class\n2025-12-30 12:08:03,929 - src.pages.automation_store.product_listing_page - INFO - Total sale items found: 2\n[RESULT] Total items on sale: 2\n[RESULT] Found 1 sale item(s):\n  1. Acqua Di Gio Pour Homme - $45.00\n[PASS] Sale items found\n\n[STEP 8] Adding sale item to cart (first time)...\n2025-12-30 12:08:10,324 - src.pages.automation_store.product_listing_page - INFO - Found 1 sale items to add to cart\n2025-12-30 12:08:21,766 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:08:23,771 - src.pages.automation_store.product_listing_page - INFO - Added Acqua Di Gio Pour Homme\t\t\t\t\t\t\t(GRM001) to cart\n[RESULT] Added 1 sale item(s) to cart\n[PASS] Sale item added to cart successfully\n\n[STEP 9] Switching to list view...\n2025-12-30 12:08:33,640 - src.pages.automation_store.product_listing_page - INFO - Switched to list view\n[PASS] Switched to list view\n\n[STEP 10] Scrolling to last item in list view...\n[PASS] Scrolled to bottom\n\n[STEP 11] Getting last item information...\n[RESULT] Last item: Acqua Di Gio Pour Homme\t\t\t\t\t\t\t(GRM001)\n[RESULT] Last item price: \n[PASS] Last item information retrieved\n\n[STEP 12] Adding last item to cart (second time)...\n2025-12-30 12:08:53,072 - src.pages.automation_store.product_detail_page - INFO - Product added to cart successfully\n2025-12-30 12:08:55,080 - src.pages.automation_store.product_listing_page - INFO - Added Acqua Di Gio Pour Homme\t\t\t\t\t\t\t(GRM001) to cart from list view\n[PASS] Last item added to cart from list view\n\n[STEP 13] Navigating to cart page...\n[PASS] Navigated to cart page\n\n[VERIFICATION] Verifying cart contents...\n\n[CART SUMMARY]\n----------------------------------------------------------------------\n  Total items in cart: 12\n  Total quantity: 55\n  Total amount: $1,327.32\n----------------------------------------------------------------------\n\n[CART ITEMS DETAILS] (12 items):\n----------------------------------------------------------------------\n  1. Men+Care Clean Comfort Deodorant\n     Quantity: 12 | Price: $7.20\n  2. Men+Care Active Clean Shower Tool\n     Quantity: 12 | Price: $6.00\n  3. Dove Men +Care Body Wash\n     Quantity: 11 | Price: $6.70\n  4. Jersey Cotton Striped Polo Shirt\n     Quantity: 3 | Price: $7.75\n  5. Fruit of the Loom T-Shirts 5 Pack - Super Premium\n     Quantity: 3 | Price: $9.99\n  6. Casual 3/4 Sleeve Baseball T-Shirt\n     Quantity: 3 | Price: $16.00\n  7. Fiorella Purple Peep Toes\n     Quantity: 3 | Price: $110.00\n  8. Ruby Shoo Womens Jada T-Bar\n     Quantity: 3 | Price: $78.00\n  9. Absolue Eye Precious Cells\n     Quantity: 1 | Price: $89.00\n  10. Creme Precieuse Nuit 50ml\n     Quantity: 1 | Price: $220.00\n  11. Flash Bronzer Body Gel\n     Quantity: 1 | Price: $29.00\n  12. Acqua Di Gio Pour Homme\n     Quantity: 2 | Price: $45.00\n----------------------------------------------------------------------\n\n[VERIFICATION] Running assertions...\n[PASS] Cart contains at least 1 item(s)\n[PASS] Total quantity is at least 2\n[PASS] Total amount is present: $1,327.32\n[PASS] Sale item &amp;#x27;Acqua Di Gio Pour Homme&amp;#x27; found in cart\n[RESULT] Sale item quantity in cart: 2\n\n======================================================================\nTEST SUMMARY\n======================================================================\n  Sale items found: 2\n  Sale item name: Acqua Di Gio Pour Homme\n  Items added (first time): 1\n  Last item added (second time): True\n  Sale item quantity in cart: 2\n  Total items in cart: 12\n  Total quantity: 55\n  Total amount: $1,327.32\n======================================================================\n[SUCCESS] TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:246 Found 2 sale items using span.sale class\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:253 Total sale items found: 2\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:350 Found 1 sale items to add to cart\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:393 Added Acqua Di Gio Pour Homme\t\t\t\t\t\t\t(GRM001) to cart\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:423 Switched to list view\nINFO     src.pages.automation_store.product_detail_page:product_detail_page.py:54 Product added to cart successfully\nINFO     src.pages.automation_store.product_listing_page:product_listing_page.py:495 Added Acqua Di Gio Pour Homme\t\t\t\t\t\t\t(GRM001) to cart from list view\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:09:01,878 - conftest - INFO - Test test_scenario_5_fragrance_sale_items_list_view[chromium] completed in 83.16s\n2025-12-30 12:09:02,431 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_5_fragrance_sale_items_list_view[chromium] completed in 83.16s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_6.py::test_scenario_6_currency_euro_delete_items[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_6.py::test_scenario_6_currency_euro_delete_items[chromium]&#34;, &#34;duration&#34;: &#34;00:01:17&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_6.py::test_scenario_6_currency_euro_delete_items[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:01:17&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:09:02,433 - conftest - INFO - Starting test: test_scenario_6_currency_euro_delete_items[chromium]\n2025-12-30 12:09:02,660 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:09:02,840 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_6_currency_euro_delete_items[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 6: CURRENCY CHANGE TO EURO &amp;amp; DELETE ITEMS\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:09:02,843 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n[PASS] Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n[PASS] Navigated to Home page\n\n[STEP 5] Navigating to cart page...\n[PASS] Navigated to cart page\n\n[STEP 6] Getting initial cart items...\n[RESULT] Initial items in cart: 12\n[RESULT] Initial cart items:\n  1. Men+Care Clean Comfort Deodorant - Qty: 12 - Price: $7.20\n  2. Men+Care Active Clean Shower Tool - Qty: 12 - Price: $6.00\n  3. Dove Men +Care Body Wash - Qty: 11 - Price: $6.70\n  4. Jersey Cotton Striped Polo Shirt - Qty: 3 - Price: $7.75\n  5. Fruit of the Loom T-Shirts 5 Pack - Super Premium - Qty: 3 - Price: $9.99\n  6. Casual 3/4 Sleeve Baseball T-Shirt - Qty: 3 - Price: $16.00\n  7. Fiorella Purple Peep Toes - Qty: 3 - Price: $110.00\n  8. Ruby Shoo Womens Jada T-Bar - Qty: 3 - Price: $78.00\n  9. Absolue Eye Precious Cells - Qty: 1 - Price: $89.00\n  10. Creme Precieuse Nuit 50ml - Qty: 1 - Price: $220.00\n  11. Flash Bronzer Body Gel - Qty: 1 - Price: $29.00\n  12. Acqua Di Gio Pour Homme - Qty: 2 - Price: $45.00\n\n[STEP 7] Changing currency to Euro...\n2025-12-30 12:09:23,726 - src.pages.automation_store.cart_page - INFO - Currency changed to Euro\n[PASS] Currency changed to Euro\n\n[STEP 8] Getting subtotal in Euro...\n[RESULT] Subtotal in Euro: \u20ac1243.88\n[RESULT] Subtotal threshold: \u20ac250.00\n\n[STEP 9] Checking if subtotal &amp;gt; 250 Euro...\n[RESULT] Subtotal (1243.88 Euro) is greater than 250 Euro\n[ACTION] Need to delete highest value items...\n\n[STEP 10] Getting cart items with totals...\n[RESULT] Found 12 items with totals:\n  1. Men+Care Clean Comfort Deodorant\n     Unit Price: 6.76\u20ac | Total: 81.12\u20ac | Value: \u20ac81.12\n  2. Men+Care Active Clean Shower Tool\n     Unit Price: 5.63\u20ac | Total: 67.56\u20ac | Value: \u20ac67.56\n  3. Dove Men +Care Body Wash\n     Unit Price: 6.29\u20ac | Total: 69.19\u20ac | Value: \u20ac69.19\n  4. Jersey Cotton Striped Polo Shirt\n     Unit Price: 7.27\u20ac | Total: 21.81\u20ac | Value: \u20ac21.81\n  5. Fruit of the Loom T-Shirts 5 Pack - Super Premium\n     Unit Price: 9.38\u20ac | Total: 28.14\u20ac | Value: \u20ac28.14\n  6. Casual 3/4 Sleeve Baseball T-Shirt\n     Unit Price: 15.02\u20ac | Total: 45.06\u20ac | Value: \u20ac45.06\n  7. Fiorella Purple Peep Toes\n     Unit Price: 103.24\u20ac | Total: 309.72\u20ac | Value: \u20ac309.72\n  8. Ruby Shoo Womens Jada T-Bar\n     Unit Price: 73.20\u20ac | Total: 219.60\u20ac | Value: \u20ac219.60\n  9. Absolue Eye Precious Cells\n     Unit Price: 83.53\u20ac | Total: 83.53\u20ac | Value: \u20ac83.53\n  10. Creme Precieuse Nuit 50ml\n     Unit Price: 206.47\u20ac | Total: 206.47\u20ac | Value: \u20ac206.47\n  11. Flash Bronzer Body Gel\n     Unit Price: 27.22\u20ac | Total: 27.22\u20ac | Value: \u20ac27.22\n  12. Acqua Di Gio Pour Homme\n     Unit Price: 42.23\u20ac | Total: 84.46\u20ac | Value: \u20ac84.46\n\n[STEP 11] Sorting items by total value (highest first)...\n[RESULT] Items sorted by value (highest to lowest):\n  1. Fiorella Purple Peep Toes - \u20ac309.72\n  2. Ruby Shoo Womens Jada T-Bar - \u20ac219.60\n  3. Creme Precieuse Nuit 50ml - \u20ac206.47\n  4. Acqua Di Gio Pour Homme - \u20ac84.46\n  5. Absolue Eye Precious Cells - \u20ac83.53\n  6. Men+Care Clean Comfort Deodorant - \u20ac81.12\n  7. Dove Men +Care Body Wash - \u20ac69.19\n  8. Men+Care Active Clean Shower Tool - \u20ac67.56\n  9. Casual 3/4 Sleeve Baseball T-Shirt - \u20ac45.06\n  10. Fruit of the Loom T-Shirts 5 Pack - Super Premium - \u20ac28.14\n  11. Flash Bronzer Body Gel - \u20ac27.22\n  12. Jersey Cotton Striped Polo Shirt - \u20ac21.81\n\n[STEP 12] Deleting highest value items until total &amp;lt;= 250 Euro...\n\n[ACTION] Current total: \u20ac1243.88\n[ACTION] Deleting item: Fiorella Purple Peep Toes (\u20ac309.72)\n2025-12-30 12:09:31,082 - src.pages.automation_store.cart_page - INFO - Deleted item at index 7\n[PASS] Item deleted. New total: \u20ac934.16\n[ACTION] Refreshing cart items after deletion...\n\n[ACTION] Current total: \u20ac934.16\n[ACTION] Deleting item: Ruby Shoo Womens Jada T-Bar (\u20ac219.60)\n2025-12-30 12:09:38,377 - src.pages.automation_store.cart_page - INFO - Deleted item at index 7\n[PASS] Item deleted. New total: \u20ac714.56\n[ACTION] Refreshing cart items after deletion...\n\n[ACTION] Current total: \u20ac714.56\n[ACTION] Deleting item: Creme Precieuse Nuit 50ml (\u20ac206.47)\n2025-12-30 12:09:45,599 - src.pages.automation_store.cart_page - INFO - Deleted item at index 8\n[PASS] Item deleted. New total: \u20ac508.09\n[ACTION] Refreshing cart items after deletion...\n\n[ACTION] Current total: \u20ac508.09\n[ACTION] Deleting item: Acqua Di Gio Pour Homme (\u20ac84.46)\n2025-12-30 12:09:52,844 - src.pages.automation_store.cart_page - INFO - Deleted item at index 9\n[PASS] Item deleted. New total: \u20ac423.63\n[ACTION] Refreshing cart items after deletion...\n\n[ACTION] Current total: \u20ac423.63\n[ACTION] Deleting item: Absolue Eye Precious Cells (\u20ac83.53)\n2025-12-30 12:09:59,988 - src.pages.automation_store.cart_page - INFO - Deleted item at index 7\n[PASS] Item deleted. New total: \u20ac340.10\n[ACTION] Refreshing cart items after deletion...\n\n[ACTION] Current total: \u20ac340.10\n[ACTION] Deleting item: Men+Care Clean Comfort Deodorant (\u20ac81.12)\n2025-12-30 12:10:07,096 - src.pages.automation_store.cart_page - INFO - Deleted item at index 1\n[PASS] Item deleted. New total: \u20ac258.98\n[ACTION] Refreshing cart items after deletion...\n\n[ACTION] Current total: \u20ac258.98\n[ACTION] Deleting item: Dove Men +Care Body Wash (\u20ac69.19)\n2025-12-30 12:10:14,107 - src.pages.automation_store.cart_page - INFO - Deleted item at index 2\n[PASS] Item deleted. New total: \u20ac189.79\n[SUCCESS] Total (189.79 Euro) is now &amp;lt;= 250 Euro\n\n[RESULT] Deleted 7 item(s)\n\n[STEP 13] Getting final total amount in Euro...\n[RESULT] Final total in Euro: \u20ac191.67\n[RESULT] Target threshold: \u20ac250.00\n[RESULT] Difference from threshold: \u20ac58.33\n\n[STEP 14] Getting final cart items...\n[RESULT] Final items in cart: 5\n[RESULT] Final cart items:\n  1. Men+Care Active Clean Shower Tool - Qty: 12 - Price: 5.63\u20ac\n  2. Jersey Cotton Striped Polo Shirt - Qty: 3 - Price: 7.27\u20ac\n  3. Fruit of the Loom T-Shirts 5 Pack - Super Premium - Qty: 3 - Price: 9.38\u20ac\n  4. Casual 3/4 Sleeve Baseball T-Shirt - Qty: 3 - Price: 15.02\u20ac\n  5. Flash Bronzer Body Gel - Qty: 1 - Price: 27.22\u20ac\n\n[VERIFICATION] Running assertions...\n[CHECK] Verifying total amount &amp;lt;= 250 Euro...\n  - Current total: \u20ac191.67\n  - Threshold: \u20ac250.00\n  - Condition: 191.67 &amp;lt;= 250.00\n[PASS] Total amount (\u20ac191.67) is &amp;lt;= 250 Euro\n[PASS] Assertion successful!\n\n======================================================================\nTEST SUMMARY\n======================================================================\n  Currency: Changed to Euro (EUR)\n  Initial items in cart: 12\n  Initial subtotal: \u20ac1243.88\n  Subtotal &amp;gt; 250 Euro: Yes\n  Items deleted: 7\n  Final items in cart: 5\n  Final subtotal: \u20ac189.79\n  Final total in Euro: \u20ac191.67\n  Target threshold: \u20ac250.00\n  Total &amp;lt;= 250 Euro: Yes\n  Test Status: PASSED\n======================================================================\n[SUCCESS] TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     src.pages.automation_store.cart_page:cart_page.py:180 Currency changed to Euro\nINFO     src.pages.automation_store.cart_page:cart_page.py:303 Deleted item at index 7\nINFO     src.pages.automation_store.cart_page:cart_page.py:303 Deleted item at index 7\nINFO     src.pages.automation_store.cart_page:cart_page.py:303 Deleted item at index 8\nINFO     src.pages.automation_store.cart_page:cart_page.py:303 Deleted item at index 9\nINFO     src.pages.automation_store.cart_page:cart_page.py:303 Deleted item at index 7\nINFO     src.pages.automation_store.cart_page:cart_page.py:303 Deleted item at index 1\nINFO     src.pages.automation_store.cart_page:cart_page.py:303 Deleted item at index 2\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:10:18,419 - conftest - INFO - Test test_scenario_6_currency_euro_delete_items[chromium] completed in 75.99s\n2025-12-30 12:10:18,961 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_6_currency_euro_delete_items[chromium] completed in 75.99s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_7.py::test_scenario_7_invalid_coupon_checkout_confirm[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_7.py::test_scenario_7_invalid_coupon_checkout_confirm[chromium]&#34;, &#34;duration&#34;: &#34;00:00:35&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_7.py::test_scenario_7_invalid_coupon_checkout_confirm[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:35&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:10:18,964 - conftest - INFO - Starting test: test_scenario_7_invalid_coupon_checkout_confirm[chromium]\n2025-12-30 12:10:19,181 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:10:19,370 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_7_invalid_coupon_checkout_confirm[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 7: INVALID COUPON, CHECKOUT &amp;amp; ORDER CONFIRMATION\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:10:19,373 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n[PASS] Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n[PASS] Navigated to Home page\n\n[STEP 5] Navigating to cart page...\n[PASS] Navigated to cart page\n\n[STEP 6] Checking cart items...\n[RESULT] Items in cart: 5\n[RESULT] Cart items:\n  1. Men+Care Active Clean Shower Tool - Qty: 12 - Price: $6.00\n  2. Jersey Cotton Striped Polo Shirt - Qty: 3 - Price: $7.75\n  3. Fruit of the Loom T-Shirts 5 Pack - Super Premium - Qty: 3 - Price: $9.99\n  4. Casual 3/4 Sleeve Baseball T-Shirt - Qty: 3 - Price: $16.00\n  5. Flash Bronzer Body Gel - Qty: 1 - Price: $29.00\n[PASS] Cart has items\n\n[STEP 7] Applying invalid coupon code...\n[ACTION] Coupon code: INVALID123\n2025-12-30 12:10:42,379 - src.pages.automation_store.cart_page - INFO - Applied coupon code: INVALID123\n[RESULT] Coupon applied: True\n[PASS] Invalid coupon code applied (error message expected)\n\n[STEP 8] Removing invalid coupon...\n2025-12-30 12:10:42,493 - src.pages.automation_store.cart_page - WARNING - Error removing coupon: Locator.click: Error: strict mode violation: locator(&amp;quot;//a[contains(@href, &amp;#x27;remove&amp;#x27;) or contains(text(), &amp;#x27;Remove&amp;#x27;)]&amp;quot;) resolved to 5 elements:\n    1) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=77&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka get_by_role(&amp;quot;link&amp;quot;).filter(has_text=re.compile(r&amp;quot;^$&amp;quot;)).nth(1)\n    2) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=120:fa80aa5a6a63e55338799d7f2ada7e12&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka get_by_role(&amp;quot;link&amp;quot;).filter(has_text=re.compile(r&amp;quot;^$&amp;quot;)).nth(3)\n    3) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=119:26a4a29af72e9fa902217e00730cfec7&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka get_by_role(&amp;quot;link&amp;quot;).filter(has_text=re.compile(r&amp;quot;^$&amp;quot;)).nth(5)\n    4) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=123:2b2351e536ad293222b586fbf65d778f&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka locator(&amp;quot;tr:nth-child(5) &amp;gt; td:nth-child(7) &amp;gt; .btn&amp;quot;)\n    5) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=67&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka locator(&amp;quot;tr:nth-child(6) &amp;gt; td:nth-child(7) &amp;gt; .btn&amp;quot;)\n\nCall log:\n  - waiting for locator(&amp;quot;//a[contains(@href, &amp;#x27;remove&amp;#x27;) or contains(text(), &amp;#x27;Remove&amp;#x27;)]&amp;quot;)\n\n[RESULT] Coupon removed: False\n[INFO] No coupon to remove or already removed\n\n[STEP 9] Proceeding to checkout...\n2025-12-30 12:10:45,744 - src.pages.automation_store.cart_page - INFO - Checkout button clicked successfully\n[PASS] Checkout button clicked\n\n[STEP 10] Waiting for checkout page to load...\n[RESULT] Current URL: https://automationteststore.com/index.php?rt=checkout/confirm\n[PASS] Checkout page loaded\n\n[STEP 11] Completing checkout steps and confirming order...\n2025-12-30 12:10:50,776 - src.pages.automation_store.cart_page - INFO - Checkout step 1, URL: https://automationteststore.com/index.php?rt=checkout/confirm\n2025-12-30 12:10:52,849 - src.pages.automation_store.cart_page - INFO - Order confirmation found in page text\n[RESULT] Confirmation message: Order confirmed successfully\n[RESULT] Final URL: https://automationteststore.com/index.php?rt=checkout/confirm\n\n[VERIFICATION] Running assertions...\n[CHECK] Verifying order confirmation message...\n[PASS] Order confirmation message found: Order confirmed successfully\n[PASS] Confirmation message contains expected keywords\n\n======================================================================\nTEST SUMMARY\n======================================================================\n  Cart items: 5\n  Invalid coupon applied: True\n  Coupon removed: False\n  Checkout completed: Yes\n  Order confirmed: Yes\n  Confirmation message: Order confirmed successfully\n  Test Status: PASSED\n======================================================================\n[SUCCESS] TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     src.pages.automation_store.cart_page:cart_page.py:357 Applied coupon code: INVALID123\nWARNING  src.pages.automation_store.cart_page:cart_page.py:389 Error removing coupon: Locator.click: Error: strict mode violation: locator(&amp;quot;//a[contains(@href, &amp;#x27;remove&amp;#x27;) or contains(text(), &amp;#x27;Remove&amp;#x27;)]&amp;quot;) resolved to 5 elements:\n    1) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=77&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka get_by_role(&amp;quot;link&amp;quot;).filter(has_text=re.compile(r&amp;quot;^$&amp;quot;)).nth(1)\n    2) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=120:fa80aa5a6a63e55338799d7f2ada7e12&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka get_by_role(&amp;quot;link&amp;quot;).filter(has_text=re.compile(r&amp;quot;^$&amp;quot;)).nth(3)\n    3) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=119:26a4a29af72e9fa902217e00730cfec7&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka get_by_role(&amp;quot;link&amp;quot;).filter(has_text=re.compile(r&amp;quot;^$&amp;quot;)).nth(5)\n    4) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=123:2b2351e536ad293222b586fbf65d778f&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka locator(&amp;quot;tr:nth-child(5) &amp;gt; td:nth-child(7) &amp;gt; .btn&amp;quot;)\n    5) &amp;lt;a class=&amp;quot;btn btn-sm btn-default&amp;quot; href=&amp;quot;https://automationteststore.com/index.php?rt=checkout/cart&amp;amp;remove=67&amp;quot;&amp;gt;\u2026&amp;lt;/a&amp;gt; aka locator(&amp;quot;tr:nth-child(6) &amp;gt; td:nth-child(7) &amp;gt; .btn&amp;quot;)\n\nCall log:\n  - waiting for locator(&amp;quot;//a[contains(@href, &amp;#x27;remove&amp;#x27;) or contains(text(), &amp;#x27;Remove&amp;#x27;)]&amp;quot;)\n\nINFO     src.pages.automation_store.cart_page:cart_page.py:153 Checkout button clicked successfully\nINFO     src.pages.automation_store.cart_page:cart_page.py:401 Checkout step 1, URL: https://automationteststore.com/index.php?rt=checkout/confirm\nINFO     src.pages.automation_store.cart_page:cart_page.py:467 Order confirmation found in page text\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:10:52,851 - conftest - INFO - Test test_scenario_7_invalid_coupon_checkout_confirm[chromium] completed in 33.89s\n2025-12-30 12:10:53,735 - conftest - INFO - Cross-browser test: Browser chromium closed\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_7_invalid_coupon_checkout_confirm[chromium] completed in 33.89s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed&#34;}], &#34;tests/automation_store/test_scenario_8.py::test_scenario_8_facebook_registration[chromium]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/automation_store/test_scenario_8.py::test_scenario_8_facebook_registration[chromium]&#34;, &#34;duration&#34;: &#34;00:00:25&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/automation_store/test_scenario_8.py::test_scenario_8_facebook_registration[chromium]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:25&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;---------------------------- Captured stdout setup -----------------------------\n2025-12-30 12:10:53,737 - conftest - INFO - Starting test: test_scenario_8_facebook_registration[chromium]\n2025-12-30 12:10:53,958 - conftest - INFO - Cross-browser test: Browser chromium launched (headless: False)\n2025-12-30 12:10:54,157 - conftest - INFO - Cross-browser test page created for browser: unknown\n\n------------------------------ Captured log setup ------------------------------\nINFO     conftest:conftest.py:239 Starting test: test_scenario_8_facebook_registration[chromium]\nINFO     conftest:conftest.py:184 Cross-browser test: Browser chromium launched (headless: False)\nINFO     conftest:conftest.py:210 Cross-browser test page created for browser: unknown\n\n----------------------------- Captured stdout call -----------------------------\n\n======================================================================\nSTARTING SCENARIO 8: FACEBOOK REGISTRATION\n======================================================================\n\n[STEP 1] Opening Automation Test Store...\n2025-12-30 12:10:54,160 - src.pages.base_page - INFO - Navigating to: https://automationteststore.com/\n[STEP 2] Clicking Login link...\n[STEP 3] Logging in...\n[PASS] Logged in as: Murtaza_123\n[STEP 4] Navigating to Home page...\n[PASS] Navigated to Home page\n\n[STEP 5] Verifying current URL before clicking Facebook...\n[RESULT] Current URL: https://automationteststore.com/\n[PASS] URL verification passed - on Automation Test Store\n\n[STEP 6] Clicking Facebook link...\n2025-12-30 12:11:08,862 - src.pages.automation_store.home_page - INFO - Clicked Facebook link\n[PASS] Facebook page opened in new window\n\n[STEP 7] Switching to Facebook window...\n[RESULT] Facebook URL: https://www.facebook.com/\n[PASS] Facebook URL verification passed\n\n[STEP 8] Clicking &amp;#x27;Create new account&amp;#x27; button...\n[RESULT] Facebook URL after clicking: https://www.facebook.com/r.php?entry_point=login\n[PASS] Clicked &amp;#x27;Create new account&amp;#x27; button\n[PASS] Still on Facebook URL after clicking create account\n\n[STEP 9] Filling Facebook registration form...\n  - First name: Test\n  - Surname: User\n  - Email: testuser@example.com\n  - Password: Set\n\n[STEP 10] Setting Date of Birth (18 years back from today)...\n[RESULT] DOB: 4 Jan 2008\n  - Day: 4\n  - Month: Jan\n  - Year: 2008\n[PASS] Date of Birth set successfully\n\n[STEP 11] Selecting Gender...\n  - Gender: Male\n[PASS] Gender selected\n\n[STEP 12] Verifying Facebook URL before closing...\n[RESULT] Facebook URL: https://www.facebook.com/r.php?entry_point=login\n[PASS] Facebook URL verification passed\n\n[STEP 13] Closing Facebook window...\n[PASS] Facebook window closed\n\n[STEP 14] Switching back to Automation Test Store window...\n[PASS] Switched back to Automation Test Store\n\n[VERIFICATION] Verifying Automation Test Store URL...\n[RESULT] Current URL: https://automationteststore.com/\n[RESULT] Original URL: https://automationteststore.com/\n[RESULT] Expected: Automation Test Store URL\n[PASS] Website URL verification passed - on Automation Test Store\n\n[VERIFICATION] Verifying URL structure...\n[PASS] URL structure verification passed\n\n[VERIFICATION] Verifying we&amp;#x27;re not on Facebook...\n[PASS] Not on Facebook - verification passed\n\n======================================================================\nTEST SUMMARY\n======================================================================\n  Original URL: https://automationteststore.com/\n  Facebook URL: https://www.facebook.com/\n  Final URL: https://automationteststore.com/\n  URL Verification: PASSED\n  DOB Set: 4 Jan 2008 (18 years back)\n  Facebook Registration: Completed\n  Facebook Window: Closed\n  Back to Automation Store: Yes\n======================================================================\n[SUCCESS] TEST PASSED - All assertions successful!\n======================================================================\n\n\n------------------------------ Captured log call -------------------------------\nINFO     src.pages.base_page:base_page.py:116 Navigating to: https://automationteststore.com/\nINFO     src.pages.automation_store.home_page:home_page.py:27 Clicked Facebook link\n\n--------------------------- Captured stdout teardown ---------------------------\n2025-12-30 12:11:17,841 - conftest - INFO - Test test_scenario_8_facebook_registration[chromium] completed in 24.10s\n2025-12-30 12:11:18,268 - conftest - INFO - Cross-browser test: Browser chromium closed\n2025-12-30 12:11:18,293 - conftest - INFO - Playwright instance stopped\n\n---------------------------- Captured log teardown -----------------------------\nINFO     conftest:conftest.py:246 Test test_scenario_8_facebook_registration[chromium] completed in 24.10s\nINFO     conftest:conftest.py:187 Cross-browser test: Browser chromium closed\nINFO     conftest:conftest.py:83 Playwright instance stopped&#34;}]}, &#34;renderCollapsed&#34;: [&#34;passed&#34;], &#34;initialSort&#34;: &#34;result&#34;, &#34;title&#34;: &#34;cross_browser_report.html&#34;}"></div>
+    <script>
+      (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const { getCollapsedCategory, setCollapsedIds } = require('./storage.js')
+
+class DataManager {
+    setManager(data) {
+        const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
+        const collapsedIds = []
+        const tests = Object.values(data.tests).flat().map((test, index) => {
+            const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            const id = `test_${index}`
+            if (collapsed) {
+                collapsedIds.push(id)
+            }
+            return {
+                ...test,
+                id,
+                collapsed,
+            }
+        })
+        const dataBlob = { ...data, tests }
+        this.data = { ...dataBlob }
+        this.renderData = { ...dataBlob }
+        setCollapsedIds(collapsedIds)
+    }
+
+    get allData() {
+        return { ...this.data }
+    }
+
+    resetRender() {
+        this.renderData = { ...this.data }
+    }
+
+    setRender(data) {
+        this.renderData.tests = [...data]
+    }
+
+    toggleCollapsedItem(id) {
+        this.renderData.tests = this.renderData.tests.map((test) =>
+            test.id === id ? { ...test, collapsed: !test.collapsed } : test,
+        )
+    }
+
+    set allCollapsed(collapsed) {
+        this.renderData = { ...this.renderData, tests: [...this.renderData.tests.map((test) => (
+            { ...test, collapsed }
+        ))] }
+    }
+
+    get testSubset() {
+        return [...this.renderData.tests]
+    }
+
+    get environment() {
+        return this.renderData.environment
+    }
+
+    get initialSort() {
+        return this.data.initialSort
+    }
+}
+
+module.exports = {
+    manager: new DataManager(),
+}
+
+},{"./storage.js":8}],2:[function(require,module,exports){
+const mediaViewer = require('./mediaviewer.js')
+const templateEnvRow = document.getElementById('template_environment_row')
+const templateResult = document.getElementById('template_results-table__tbody')
+
+function htmlToElements(html) {
+    const temp = document.createElement('template')
+    temp.innerHTML = html
+    return temp.content.childNodes
+}
+
+const find = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return elem.querySelector(selector)
+}
+
+const findAll = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return [...elem.querySelectorAll(selector)]
+}
+
+const dom = {
+    getStaticRow: (key, value) => {
+        const envRow = templateEnvRow.content.cloneNode(true)
+        const isObj = typeof value === 'object' && value !== null
+        const values = isObj ? Object.keys(value).map((k) => `${k}: ${value[k]}`) : null
+
+        const valuesElement = htmlToElements(
+            values ? `<ul>${values.map((val) => `<li>${val}</li>`).join('')}<ul>` : `<div>${value}</div>`)[0]
+        const td = findAll('td', envRow)
+        td[0].textContent = key
+        td[1].appendChild(valuesElement)
+
+        return envRow
+    },
+    getResultTBody: ({ testId, id, log, extras, resultsTableRow, tableHtml, result, collapsed }) => {
+        const resultBody = templateResult.content.cloneNode(true)
+        resultBody.querySelector('tbody').classList.add(result.toLowerCase())
+        resultBody.querySelector('tbody').id = testId
+        resultBody.querySelector('.collapsible').dataset.id = id
+
+        resultsTableRow.forEach((html) => {
+            const t = document.createElement('template')
+            t.innerHTML = html
+            resultBody.querySelector('.collapsible').appendChild(t.content)
+        })
+
+        if (log) {
+            // Wrap lines starting with "E" with span.error to color those lines red
+            const wrappedLog = log.replace(/^E.*$/gm, (match) => `<span class="error">${match}</span>`)
+            resultBody.querySelector('.log').innerHTML = wrappedLog
+        } else {
+            resultBody.querySelector('.log').remove()
+        }
+
+        if (collapsed) {
+            resultBody.querySelector('.collapsible > td')?.classList.add('collapsed')
+            resultBody.querySelector('.extras-row').classList.add('hidden')
+        } else {
+            resultBody.querySelector('.collapsible > td')?.classList.remove('collapsed')
+        }
+
+        const media = []
+        extras?.forEach(({ name, format_type, content }) => {
+            if (['image', 'video'].includes(format_type)) {
+                media.push({ path: content, name, format_type })
+            }
+
+            if (format_type === 'html') {
+                resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
+            }
+        })
+        mediaViewer.setup(resultBody, media)
+
+        // Add custom html from the pytest_html_results_table_html hook
+        tableHtml?.forEach((item) => {
+            resultBody.querySelector('td[class="extra"]').insertAdjacentHTML('beforeend', item)
+        })
+
+        return resultBody
+    },
+}
+
+module.exports = {
+    dom,
+    htmlToElements,
+    find,
+    findAll,
+}
+
+},{"./mediaviewer.js":6}],3:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const storageModule = require('./storage.js')
+
+const getFilteredSubSet = (filter) =>
+    manager.allData.tests.filter(({ result }) => filter.includes(result.toLowerCase()))
+
+const doInitFilter = () => {
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+}
+
+const doFilter = (type, show) => {
+    if (show) {
+        storageModule.showCategory(type)
+    } else {
+        storageModule.hideCategory(type)
+    }
+
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+
+    const sortColumn = storageModule.getSort()
+    doSort(sortColumn, true)
+}
+
+module.exports = {
+    doFilter,
+    doInitFilter,
+}
+
+},{"./datamanager.js":1,"./sort.js":7,"./storage.js":8}],4:[function(require,module,exports){
+const { redraw, bindEvents, renderStatic } = require('./main.js')
+const { doInitFilter } = require('./filter.js')
+const { doInitSort } = require('./sort.js')
+const { manager } = require('./datamanager.js')
+const data = JSON.parse(document.getElementById('data-container').dataset.jsonblob)
+
+function init() {
+    manager.setManager(data)
+    doInitFilter()
+    doInitSort()
+    renderStatic()
+    redraw()
+    bindEvents()
+}
+
+init()
+
+},{"./datamanager.js":1,"./filter.js":3,"./main.js":5,"./sort.js":7}],5:[function(require,module,exports){
+const { dom, find, findAll } = require('./dom.js')
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const { doFilter } = require('./filter.js')
+const {
+    getVisible,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    getSortDirection,
+    possibleFilters,
+} = require('./storage.js')
+
+const removeChildren = (node) => {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild)
+    }
+}
+
+const renderStatic = () => {
+    const renderEnvironmentTable = () => {
+        const environment = manager.environment
+        const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
+        const table = document.getElementById('environment')
+        removeChildren(table)
+        rows.forEach((row) => table.appendChild(row))
+    }
+    renderEnvironmentTable()
+}
+
+const addItemToggleListener = (elem) => {
+    elem.addEventListener('click', ({ target }) => {
+        const id = target.parentElement.dataset.id
+        manager.toggleCollapsedItem(id)
+
+        const collapsedIds = getCollapsedIds()
+        if (collapsedIds.includes(id)) {
+            const updated = collapsedIds.filter((item) => item !== id)
+            setCollapsedIds(updated)
+        } else {
+            collapsedIds.push(id)
+            setCollapsedIds(collapsedIds)
+        }
+        redraw()
+    })
+}
+
+const renderContent = (tests) => {
+    const sortAttr = getSort(manager.initialSort)
+    const sortAsc = JSON.parse(getSortDirection())
+    const rows = tests.map(dom.getResultTBody)
+    const table = document.getElementById('results-table')
+    const tableHeader = document.getElementById('results-table-head')
+
+    const newTable = document.createElement('table')
+    newTable.id = 'results-table'
+
+    // remove all sorting classes and set the relevant
+    findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
+    newTable.appendChild(tableHeader)
+
+    if (!rows.length) {
+        const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
+        newTable.appendChild(emptyTable)
+    } else {
+        rows.forEach((row) => {
+            if (!!row) {
+                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                find('.logexpander', row).addEventListener('click',
+                    (evt) => evt.target.parentNode.classList.toggle('expanded'),
+                )
+                newTable.appendChild(row)
+            }
+        })
+    }
+
+    table.replaceWith(newTable)
+}
+
+const renderDerived = () => {
+    const currentFilter = getVisible()
+    possibleFilters.forEach((result) => {
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        input.checked = currentFilter.includes(result)
+    })
+}
+
+const bindEvents = () => {
+    const filterColumn = (evt) => {
+        const { target: element } = evt
+        const { testResult } = element.dataset
+
+        doFilter(testResult, element.checked)
+        const collapsedIds = getCollapsedIds()
+        const updated = manager.renderData.tests.map((test) => {
+            return {
+                ...test,
+                collapsed: collapsedIds.includes(test.id),
+            }
+        })
+        manager.setRender(updated)
+        redraw()
+    }
+
+    const header = document.getElementById('environment-header')
+    header.addEventListener('click', () => {
+        const table = document.getElementById('environment')
+        table.classList.toggle('hidden')
+        header.classList.toggle('collapsed')
+    })
+
+    findAll('input[name="filter_checkbox"]').forEach((elem) => {
+        elem.addEventListener('click', filterColumn)
+    })
+
+    findAll('.sortable').forEach((elem) => {
+        elem.addEventListener('click', (evt) => {
+            const { target: element } = evt
+            const { columnType } = element.dataset
+            doSort(columnType)
+            redraw()
+        })
+    })
+
+    document.getElementById('show_all_details').addEventListener('click', () => {
+        manager.allCollapsed = false
+        setCollapsedIds([])
+        redraw()
+    })
+    document.getElementById('hide_all_details').addEventListener('click', () => {
+        manager.allCollapsed = true
+        const allIds = manager.renderData.tests.map((test) => test.id)
+        setCollapsedIds(allIds)
+        redraw()
+    })
+}
+
+const redraw = () => {
+    const { testSubset } = manager
+
+    renderContent(testSubset)
+    renderDerived()
+}
+
+module.exports = {
+    redraw,
+    bindEvents,
+    renderStatic,
+}
+
+},{"./datamanager.js":1,"./dom.js":2,"./filter.js":3,"./sort.js":7,"./storage.js":8}],6:[function(require,module,exports){
+class MediaViewer {
+    constructor(assets) {
+        this.assets = assets
+        this.index = 0
+    }
+
+    nextActive() {
+        this.index = this.index === this.assets.length - 1 ? 0 : this.index + 1
+        return [this.activeFile, this.index]
+    }
+
+    prevActive() {
+        this.index = this.index === 0 ? this.assets.length - 1 : this.index -1
+        return [this.activeFile, this.index]
+    }
+
+    get currentIndex() {
+        return this.index
+    }
+
+    get activeFile() {
+        return this.assets[this.index]
+    }
+}
+
+
+const setup = (resultBody, assets) => {
+    if (!assets.length) {
+        resultBody.querySelector('.media').classList.add('hidden')
+        return
+    }
+
+    const mediaViewer = new MediaViewer(assets)
+    const container = resultBody.querySelector('.media-container')
+    const leftArrow = resultBody.querySelector('.media-container__nav--left')
+    const rightArrow = resultBody.querySelector('.media-container__nav--right')
+    const mediaName = resultBody.querySelector('.media__name')
+    const counter = resultBody.querySelector('.media__counter')
+    const imageEl = resultBody.querySelector('img')
+    const sourceEl = resultBody.querySelector('source')
+    const videoEl = resultBody.querySelector('video')
+
+    const setImg = (media, index) => {
+        if (media?.format_type === 'image') {
+            imageEl.src = media.path
+
+            imageEl.classList.remove('hidden')
+            videoEl.classList.add('hidden')
+        } else if (media?.format_type === 'video') {
+            sourceEl.src = media.path
+
+            videoEl.classList.remove('hidden')
+            imageEl.classList.add('hidden')
+        }
+
+        mediaName.innerText = media?.name
+        counter.innerText = `${index + 1} / ${assets.length}`
+    }
+    setImg(mediaViewer.activeFile, mediaViewer.currentIndex)
+
+    const moveLeft = () => {
+        const [media, index] = mediaViewer.prevActive()
+        setImg(media, index)
+    }
+    const doRight = () => {
+        const [media, index] = mediaViewer.nextActive()
+        setImg(media, index)
+    }
+    const openImg = () => {
+        window.open(mediaViewer.activeFile.path, '_blank')
+    }
+    if (assets.length === 1) {
+        container.classList.add('media-container--fullscreen')
+    } else {
+        leftArrow.addEventListener('click', moveLeft)
+        rightArrow.addEventListener('click', doRight)
+    }
+    imageEl.addEventListener('click', openImg)
+}
+
+module.exports = {
+    setup,
+}
+
+},{}],7:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const storageModule = require('./storage.js')
+
+const genericSort = (list, key, ascending, customOrder) => {
+    let sorted
+    if (customOrder) {
+        sorted = list.sort((a, b) => {
+            const aValue = a.result.toLowerCase()
+            const bValue = b.result.toLowerCase()
+
+            const aIndex = customOrder.findIndex((item) => item.toLowerCase() === aValue)
+            const bIndex = customOrder.findIndex((item) => item.toLowerCase() === bValue)
+
+            // Compare the indices to determine the sort order
+            return aIndex - bIndex
+        })
+    } else {
+        sorted = list.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1)
+    }
+
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const durationSort = (list, ascending) => {
+    const parseDuration = (duration) => {
+        if (duration.includes(':')) {
+            // If it's in the format "HH:mm:ss"
+            const [hours, minutes, seconds] = duration.split(':').map(Number)
+            return (hours * 3600 + minutes * 60 + seconds) * 1000
+        } else {
+            // If it's in the format "nnn ms"
+            return parseInt(duration)
+        }
+    }
+    const sorted = list.sort((a, b) => parseDuration(a['duration']) - parseDuration(b['duration']))
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const doInitSort = () => {
+    const type = storageModule.getSort(manager.initialSort)
+    const ascending = storageModule.getSortDirection()
+    const list = manager.testSubset
+    const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
+
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    if (type?.toLowerCase() === 'original') {
+        manager.setRender(list)
+    } else {
+        let sortedList
+        switch (type) {
+        case 'duration':
+            sortedList = durationSort(list, ascending)
+            break
+        case 'result':
+            sortedList = genericSort(list, type, ascending, initialOrder)
+            break
+        default:
+            sortedList = genericSort(list, type, ascending)
+            break
+        }
+        manager.setRender(sortedList)
+    }
+}
+
+const doSort = (type, skipDirection) => {
+    const newSortType = storageModule.getSort(manager.initialSort) !== type
+    const currentAsc = storageModule.getSortDirection()
+    let ascending
+    if (skipDirection) {
+        ascending = currentAsc
+    } else {
+        ascending = newSortType ? false : !currentAsc
+    }
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    const list = manager.testSubset
+    const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
+    manager.setRender(sortedList)
+}
+
+module.exports = {
+    doInitSort,
+    doSort,
+}
+
+},{"./datamanager.js":1,"./storage.js":8}],8:[function(require,module,exports){
+const possibleFilters = [
+    'passed',
+    'skipped',
+    'failed',
+    'error',
+    'xfailed',
+    'xpassed',
+    'rerun',
+]
+
+const getVisible = () => {
+    const url = new URL(window.location.href)
+    const settings = new URLSearchParams(url.search).get('visible')
+    const lower = (item) => {
+        const lowerItem = item.toLowerCase()
+        if (possibleFilters.includes(lowerItem)) {
+            return lowerItem
+        }
+        return null
+    }
+    return settings === null ?
+        possibleFilters :
+        [...new Set(settings?.split(',').map(lower).filter((item) => item))]
+}
+
+const hideCategory = (categoryToHide) => {
+    const url = new URL(window.location.href)
+    const visibleParams = new URLSearchParams(url.search).get('visible')
+    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFilters]
+    const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
+
+    url.searchParams.set('visible', settings)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const showCategory = (categoryToShow) => {
+    if (typeof window === 'undefined') {
+        return
+    }
+    const url = new URL(window.location.href)
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',').filter(Boolean) ||
+        [...possibleFilters]
+    const settings = [...new Set([categoryToShow, ...currentVisible])]
+    const noFilter = possibleFilters.length === settings.length || !settings.length
+
+    noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getSort = (initialSort) => {
+    const url = new URL(window.location.href)
+    let sort = new URLSearchParams(url.search).get('sort')
+    if (!sort) {
+        sort = initialSort || 'result'
+    }
+    return sort
+}
+
+const setSort = (type) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('sort', type)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getCollapsedCategory = (renderCollapsed) => {
+    let categories
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        const collapsedItems = new URLSearchParams(url.search).get('collapsed')
+        switch (true) {
+        case !renderCollapsed && collapsedItems === null:
+            categories = ['passed']
+            break
+        case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+            categories = []
+            break
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(renderCollapsed):
+            categories = [...possibleFilters]
+            break
+        default:
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || renderCollapsed
+            break
+        }
+    } else {
+        categories = []
+    }
+    return categories
+}
+
+const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc')) || false
+const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascending)
+
+const getCollapsedIds = () => JSON.parse(sessionStorage.getItem('collapsedIds')) || []
+const setCollapsedIds = (list) => sessionStorage.setItem('collapsedIds', JSON.stringify(list))
+
+module.exports = {
+    getVisible,
+    hideCategory,
+    showCategory,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    setSort,
+    getSortDirection,
+    setSortDirection,
+    getCollapsedCategory,
+    possibleFilters,
+}
+
+},{}]},{},[4]);
+    </script>
+  </footer>
+</html>

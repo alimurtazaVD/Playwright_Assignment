@@ -11,7 +11,7 @@ from src.utils.config_manager import config_manager
 
 logger = logging.getLogger(__name__)
 
-
+@pytest.mark.cross_browser
 @pytest.mark.smoke
 def test_scenario_1_invalid_password(page, base_url):
     # 1 Go to url, 2 valid username, 3 invalid password, 4 click sign in, assert error
@@ -29,7 +29,7 @@ def test_scenario_1_invalid_password(page, base_url):
         f"Invalid-credentials message mismatch.\nExpected: {expected_msg}\nActual:   {actual_msg}"
     )
 
-
+@pytest.mark.cross_browser
 @pytest.mark.smoke
 def test_scenario_2_valid_login(page, base_url):
     login = SwagLoginPage(page)
@@ -51,7 +51,7 @@ def test_scenario_2_valid_login(page, base_url):
         f"Inventory page title mismatch. Expected: {expected_title}, Actual: {actual_title}"
     )
 
-
+@pytest.mark.cross_browser
 @pytest.mark.regression
 def test_scenario_3_sort_and_cart(page, base_url):
     # Login
@@ -97,7 +97,7 @@ def test_scenario_3_sort_and_cart(page, base_url):
         f"Cart prices mismatch.\nExpected (two lowest added): {expected_prices}\nActual (first two in cart): {actual_selected}"
     )
 
-
+@pytest.mark.cross_browser
 @pytest.mark.regression
 def test_scenario_4_multiple_flow(page, base_url):
     """Scenario 4: Multiple Test
